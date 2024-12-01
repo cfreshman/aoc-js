@@ -1,0 +1,13 @@
+{
+  "name": "aoc-js",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "solve": "node index.js run $@",
+    "new": "node index.js new",
+    "test": "node index.js test",
+    "save": "node index.js save $@",
+    "load": "node index.js load $@"
+  }
+}
