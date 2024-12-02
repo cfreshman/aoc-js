@@ -2,16 +2,39 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     {
-      let rs = lines.map(x => {
-        
+      const vowels = new Set('aeiou')
+      const bads = { a:'b', c:'d', p:'q', x:'y' }
+      let nice = 0
+      lines.map(x => {
+        let vowel_count = 0
+        let has_double = false
+        let has_bad = false
+        for (let i = 0; i < x.length; i++) {
+          if (vowels.has(x[i])) vowel_count++
+          if (i < x.length - 1) {
+            if (x[i] === x[i + 1]) has_double = true
+            if (bads[x[i]] === x[i + 1]) has_bad = true
+          }
+        }
+        if (vowel_count >= 3 && has_double && !has_bad) nice++
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      p1(nice)
     }
     {
-      
-      p2()
+      let nice = 0
+      lines.map(x => {
+        let has_twice_pair = false
+        let has_sandwich = false
+        for (let i = 0; i < x.length; i++) {
+          let pair = x.slice(i, i + 2)
+          for (let j = i + 2; j < x.length; j++) {
+            if (pair === x.slice(j, j + 2)) has_twice_pair = true
+          }
+          if (x[i] === x[i + 2]) has_sandwich = true
+        }
+        if (has_twice_pair && has_sandwich) nice++
+      })
+      p2(nice)
     }
   })
 

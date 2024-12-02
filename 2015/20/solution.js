@@ -1,17 +1,34 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
+    l('warning: slow problem')
     {
-      let rs = lines.map(x => {
-        
-      })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      let next_logged_percent = 1
+      const target = Number(input)
+      const presents = Array(target).fill(0)
+      for (let i = 1; i < target; i++) {
+        for (let j = i; j < target; j += i) {
+          presents[j] += i * 10
+        }
+
+        const percent = Math.floor(i / target * 100)
+        if (percent >= next_logged_percent) {
+          l(percent + '%')
+          next_logged_percent += 1
+        }
+      }
+      p1(presents.findIndex(p => p >= target))
     }
     {
-      
-      p2()
+      const target = Number(input)
+      const presents = Array(target).fill(0)
+      for (let i = 1; i < target; i++) {
+        for (let j = 0; j < 50; j++) {
+          if (i + i * j >= target) break
+          presents[i + i * j] += i * 11
+        }
+      }
+      p2(presents.findIndex(p => p >= target))
     }
   })
 

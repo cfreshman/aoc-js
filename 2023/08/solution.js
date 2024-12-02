@@ -2,6 +2,21 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     {
+      // const [inst, nodes] = input.split('\n\n')
+      // const map = {}
+      // nodes.split('\n').map(line => {
+      //   const [key, others] = line.split(' = ')
+      //   const [left, right] = others.slice(1, -1).split(', ')
+      //   map[key] = [left, right]
+      // })
+      // let steps = 0, place = 'AAA', goal = 'ZZZ'
+      // while (place !== goal) {
+      //   place = map[place][inst[steps % inst.length] === 'L' ? 0 : 1]
+      //   steps += 1
+      // }
+      // p1(steps)
+    }
+    {
       const [inst, nodes] = input.split('\n\n')
       const map = {}
       nodes.split('\n').map(line => {
@@ -9,18 +24,15 @@ if (!globalThis.window) globalThis.window = globalThis
         const [left, right] = others.slice(1, -1).split(', ')
         map[key] = [left, right]
       })
-
-      let steps = 0, place = keys(map)[0], goal = keys(map).at(-1)
-      while (place !== goal) {
-        place = map[place][inst[steps % inst.length] === 'L' ? 0 : 1]
+      let steps = 0, places = Object.keys(map).filter(x => x.at(-1) === 'A')
+      while (places.some(x => x.at(-1) !== 'Z')) {
+        const side = inst[steps % inst.length] === 'L' ? 0 : 1
+        for (let i = 0; i < places.length; i++) {
+          places[i] = map[places[i]][side]
+        }
         steps += 1
       }
-
-      p1(steps)
-    }
-    {
-      
-      p2()
+      p2(steps)
     }
   })
 

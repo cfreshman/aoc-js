@@ -1,17 +1,86 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
-    {
-      let rs = lines.map(x => {
-        
-      })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+    const weapons = [
+      [8, 4, 0],
+      [10, 5, 0],
+      [25, 6, 0],
+      [40, 7, 0],
+      [74, 8, 0],
+    ]
+    const armors = [
+      [13, 0, 1],
+      [31, 0, 2],
+      [53, 0, 3],
+      [75, 0, 4],
+      [102, 0, 5],
+      [0, 0, 0],
+    ]
+    const rings = [
+      [25, 1, 0],
+      [50, 2, 0],
+      [100, 3, 0],
+      [20, 0, 1],
+      [40, 0, 2],
+      [80, 0, 3],
+      [0, 0, 0],
+      [0, 0, 0],
+    ]
+    const boss = {
+      hp: Number(lines[0].split(': ')[1]),
+      dmg: Number(lines[1].split(': ')[1]),
+      amr: Number(lines[2].split(': ')[1]),
+    }
+    const player = {
+      hp: 100,
+      dmg: 0,
+      amr: 0,
+    }
+    const simulate = () => {
+      const sim_boss = { ...boss }
+      const sim_player = { ...player }
+      while (true) {
+        sim_boss.hp -= Math.max(1, sim_player.dmg - sim_boss.amr)
+        if (sim_boss.hp <= 0) return true
+        sim_player.hp -= Math.max(1, sim_boss.dmg - sim_player.amr)
+        if (sim_player.hp <= 0) return false
+      }
     }
     {
-      
-      p2()
+      let min_cost = Infinity
+      for (const weapon of weapons) {
+        for (const armor of armors) {
+          for (let i = 0; i < rings.length; i++) {
+            for (let j = i + 1; j < rings.length; j++) {
+              player.dmg = weapon[1] + rings[i][1] + rings[j][1]
+              player.amr = armor[2] + rings[i][2] + rings[j][2]
+              const cost = weapon[0] + armor[0] + rings[i][0] + rings[j][0]
+              if (simulate()) {
+                min_cost = Math.min(min_cost, cost)
+              }
+            }
+          }
+        }
+      }
+      p1(min_cost)
+    }
+    {
+      let max_cost = 0
+      for (const weapon of weapons) {
+        for (const armor of armors) {
+          for (let i = 0; i < rings.length; i++) {
+            for (let j = i + 1; j < rings.length; j++) {
+              player.dmg = weapon[1] + rings[i][1] + rings[j][1]
+              player.amr = armor[2] + rings[i][2] + rings[j][2]
+              const cost = weapon[0] + armor[0] + rings[i][0] + rings[j][0]
+              if (!simulate()) {
+                max_cost = Math.max(max_cost, cost)
+              }
+            }
+          }
+        }
+      }
+      p2(max_cost)
     }
   })
 

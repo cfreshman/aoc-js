@@ -2,16 +2,33 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     {
-      let rs = lines.map(x => {
-        
+      const pos = { x: 0, y: 0 }
+      const visited = new Set()
+      const mark = () => visited.add(`${pos.x},${pos.y}`)
+      mark()
+      Array.from(input).map(inst => {
+        if (inst === '>') pos.x++
+        if (inst === '<') pos.x--
+        if (inst === '^') pos.y++
+        if (inst === 'v') pos.y--
+        mark()
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      p1(visited.size)
     }
     {
-      
-      p2()
+      const pos = { x: 0, y: 0 }, anti = { x: 0, y: 0 }
+      const visited = new Set()
+      const mark = (p) => visited.add(`${p.x},${p.y}`)
+      mark(pos)
+      Array.from(input).map((inst, i) => {
+        const p = i % 2 ? anti : pos
+        if (inst === '>') p.x++
+        if (inst === '<') p.x--
+        if (inst === '^') p.y++
+        if (inst === 'v') p.y--
+        mark(p)
+      })
+      p2(visited.size)
     }
   })
 

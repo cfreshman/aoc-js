@@ -2,16 +2,37 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     {
-      let rs = lines.map(x => {
-        
+      let safe = 0
+      lines.map(x => {
+        const vals = x.split(' ').map(Number)
+        let inc = vals[1] > vals[0]
+        for (let i = 1; i < vals.length; i++) {
+          const diff = Math.abs(vals[i] - vals[i - 1])
+          if (inc !== (vals[i] > vals[i - 1]) || diff > 3 || diff < 1) {
+            return
+          }
+        }
+        safe += 1
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      p1(safe)
     }
     {
-      
-      p2()
+      let safe = 0
+      lines.map(x => {
+        const V = x.split(' ').map(Number)
+        if (!V.every((v, j) => {
+          const vals = V.slice()
+          vals.splice(j, 1)
+          let inc = vals[1] > vals[0]
+          for (let i = 1; i < vals.length; i++) {
+            const diff = Math.abs(vals[i] - vals[i - 1])
+            if (inc !== (vals[i] > vals[i - 1]) || diff > 3 || diff < 1) {
+              return true
+            }
+          }
+        })) safe += 1
+      })
+      p2(safe)
     }
   })
 

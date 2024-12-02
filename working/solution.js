@@ -32,7 +32,7 @@ if (!globalThis.window) globalThis.window = globalThis
     i: (ar, i) => (i < 0) ? ar[ar.length + i] : ar[i],
     wrap: (ar, i) => ar[(ar.length + i) % ar.length],
     numsort: (ar, func = Number) => ar.sort((a, b) => func(a) - func(b)),
-    maxxing: (xs, f) => {
+    maxxing: (xs, f=x=>x) => {
       if (!xs.length) return undefined
       let max_i = 0, max_value = f(xs[0])
       for (let i = 1; i < xs.length; i++) {
@@ -44,7 +44,7 @@ if (!globalThis.window) globalThis.window = globalThis
       }
       return xs[max_i]
     },
-    minning: (xs, f) => {
+    minning: (xs, f=x=>x) => {
       if (!xs.length) return undefined
       let min_i = 0, min_value = f(xs[0])
       for (let i = 1; i < xs.length; i++) {

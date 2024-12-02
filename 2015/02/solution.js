@@ -2,16 +2,23 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     {
-      let rs = lines.map(x => {
-        
+      const rs = lines.map(x => {
+        const [l, w, h] = x.split('x').map(Number)
+        const sides = [l * w, w * h, h * l]
+        const min = U.minning(sides)
+        return 2 * U.sum(sides) + min
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      p1(U.sum(rs))
     }
     {
-      
-      p2()
+      const rs = lines.map(x => {
+        const [l, w, h] = x.split('x').map(Number)
+        const perims = [2 * (l + w), 2 * (w + h), 2 * (h + l)]
+        const min = U.minning(perims)
+        const v = l * w * h
+        return min + v
+      })
+      p1(U.sum(rs))
     }
   })
 

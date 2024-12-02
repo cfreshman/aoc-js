@@ -2,16 +2,24 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     {
-      let rs = lines.map(x => {
-        
-      })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      const crypto = require('crypto')
+      for (let i = 0;; i++) {
+        const hash = crypto.createHash('md5').update(input + i).digest('hex')
+        if (hash.startsWith('00000')) {
+          p1(i)
+          break
+        }
+      }
     }
     {
-      
-      p2()
+      const crypto = require('crypto')
+      for (let i = 0;; i++) {
+        const hash = crypto.createHash('md5').update(input + i).digest('hex')
+        if (hash.startsWith('000000')) {
+          p2(i)
+          break
+        }
+      }
     }
   })
 

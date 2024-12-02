@@ -2,16 +2,23 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     {
-      let rs = lines.map(x => {
-        
+      let floor = 0
+      Array.from(input).map(x => {
+        floor += x === '(' ? 1 : -1
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      p1(floor)
     }
     {
-      
-      p2()
+      let floor = 0
+      let basement_pos = 0
+      Array.from(input).some((x, i) => {
+        floor += x === '(' ? 1 : -1
+        if (floor === -1) {
+          basement_pos = i + 1
+          return true
+        }
+      })
+      p2(basement_pos)
     }
   })
 
@@ -32,7 +39,7 @@ if (!globalThis.window) globalThis.window = globalThis
     i: (ar, i) => (i < 0) ? ar[ar.length + i] : ar[i],
     wrap: (ar, i) => ar[(ar.length + i) % ar.length],
     numsort: (ar, func = Number) => ar.sort((a, b) => func(a) - func(b)),
-    maxxing: (xs, f=x=>x) => {
+    maxxing: (xs, f) => {
       if (!xs.length) return undefined
       let max_i = 0, max_value = f(xs[0])
       for (let i = 1; i < xs.length; i++) {
@@ -44,7 +51,7 @@ if (!globalThis.window) globalThis.window = globalThis
       }
       return xs[max_i]
     },
-    minning: (xs, f=x=>x) => {
+    minning: (xs, f) => {
       if (!xs.length) return undefined
       let min_i = 0, min_value = f(xs[0])
       for (let i = 1; i < xs.length; i++) {

@@ -2,16 +2,34 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     {
-      let rs = lines.map(x => {
-        
+      const lights = range(1000).map(i => range(1000).map(j => 0))
+      lines.map(x => {
+        let f
+        if (x.startsWith('turn on')) f = () => 1
+        if (x.startsWith('turn off')) f = () => 0
+        if (x.startsWith('toggle')) f = x => 1 - x
+        x = x.replace(/(turn (on|off)|toggle) /, '')
+        const [x1, y1, x2, y2] = x.split(' through ').flatMap(s => s.split(',').map(Number))
+        for (let i = x1; i <= x2; i++)
+          for (let j = y1; j <= y2; j++)
+            lights[i][j] = f(lights[i][j])
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      p1(U.sum(lights.map(row => U.sum(row))))
     }
     {
-      
-      p2()
+      const lights = range(1000).map(i => range(1000).map(j => 0))
+      lines.map(x => {
+        let f
+        if (x.startsWith('turn on')) f = x => x + 1
+        if (x.startsWith('turn off')) f = x => Math.max(0, x - 1)
+        if (x.startsWith('toggle')) f = x => x + 2
+        x = x.replace(/(turn (on|off)|toggle) /, '')
+        const [x1, y1, x2, y2] = x.split(' through ').flatMap(s => s.split(',').map(Number))
+        for (let i = x1; i <= x2; i++)
+          for (let j = y1; j <= y2; j++)
+            lights[i][j] = f(lights[i][j])
+      })
+      p2(U.sum(lights.map(row => U.sum(row))))
     }
   })
 
