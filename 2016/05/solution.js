@@ -2,16 +2,31 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     if (1) {
-      let rs = lines.map(x => {
-        
-      })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      let pass = ''
+      for (let i = 0;; i++) {
+        const hash = U.md5(input + i)
+        if (hash.startsWith('00000')) {
+          pass += hash[5]
+          l('→', pass.length, pass)
+          if (pass.length === 8) break
+        }
+      }
+      p1(pass)
     }
     if (1) {
-      
-      p2()
+      let pass = range(8).map(i => ' '), filled = 0
+      for (let i = 0;; i++) {
+        const hash = U.md5(input + i)
+        if (hash.startsWith('00000')) {
+          if (hash[5] < '8' && pass[hash[5]] === ' ') {
+            pass[hash[5]] = hash[6]
+            filled++
+            l('→', filled, pass.join(''))
+            if (filled === 8) break
+          }
+        }
+      }
+      p2(pass.join(''))
     }
   })
 
@@ -92,5 +107,8 @@ if (!globalThis.window) globalThis.window = globalThis
     MinPriorityQueue: PQN,
     MaxPriorityQueue: PQX,
   } = require('@datastructures-js/priority-queue')
+
+  const crypto = require('crypto')
+  U.md5 = (str) => crypto.createHash('md5').update(str).digest('hex')
 })()
 module.exports = solution

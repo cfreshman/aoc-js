@@ -2,16 +2,17 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     if (1) {
-      let rs = lines.map(x => {
-        
-      })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      const groups = lines.map(x => U.numsort(Array.from(x.matchAll(/\d+/g)).map(x => Number(x[0]))))
+      const triangles = groups.filter(([a, b, c]) => a + b > c)
+      p1(triangles.length)
     }
     if (1) {
-      
-      p2()
+      const rows = lines.map(x => Array.from(x.matchAll(/\d+/g)).map(x => Number(x[0])))
+      const triangles = U
+        .group(rows, 3)
+        .flatMap(group => U.numsort(range(3).map(i => group.map(x => x[i]))))
+        .filter(([a, b, c]) => a + b > c)
+      p2(triangles.length)
     }
   })
 

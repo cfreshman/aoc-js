@@ -56,6 +56,13 @@ if (!globalThis.window) globalThis.window = globalThis
       }
       return xs[min_i]
     },
+    group: (xs, n) => {
+      const groups = []
+      for (let i = 0; i < xs.length; i += n) {
+        groups.push(xs.slice(i, Math.min(xs.length, i + n)))
+      }
+      return groups
+    },
     sum: (ar, func) => ar.reduce((sum, val) => sum + U.opt(val, func), 0),
     product: (ar, func) => ar.reduce((prod, val) => prod * U.opt(val, func), 1),
     match: (strs, regex, func) => strs.map(str => U.opt(str.match(regex), func)),
@@ -81,9 +88,9 @@ if (!globalThis.window) globalThis.window = globalThis
 
   // https://github.com/datastructures-js/priority-queue
   const {
-    PriorityQueue,
-    MinPriorityQueue,
-    MaxPriorityQueue,
+    PriorityQueue: PQ,
+    MinPriorityQueue: PQN,
+    MaxPriorityQueue: PQX,
   } = require('@datastructures-js/priority-queue')
 })()
 module.exports = solution

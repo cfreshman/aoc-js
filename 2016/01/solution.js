@@ -1,17 +1,51 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
+    const DIRS = [
+      [0, 1], // N
+      [1, 0], // E
+      [0, -1], // S
+      [-1, 0], // W
+    ]
     if (1) {
-      let rs = lines.map(x => {
-        
+      const state = {
+        x: 0,
+        y: 0,
+        dir_i: 0,
+      }
+      input.split(', ').map(inst => {
+        const turn = inst[0]
+        const dist = Number(inst.slice(1))
+        state.dir_i = (state.dir_i + (turn === 'R' ? 1 : 3)) % 4
+        const [dx, dy] = DIRS[state.dir_i]
+        state.x += dx * dist
+        state.y += dy * dist
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      p1(Math.abs(state.x) + Math.abs(state.y))
     }
     if (1) {
-      
-      p2()
+      const state = {
+        x: 0,
+        y: 0,
+        dir_i: 0,
+      }
+      const visited = new Set(['0,0'])
+      input.split(', ').some(inst => {
+        const turn = inst[0]
+        const dist = Number(inst.slice(1))
+        state.dir_i = (state.dir_i + (turn === 'R' ? 1 : 3)) % 4
+        const [dx, dy] = DIRS[state.dir_i]
+        for (let i = 0; i < dist; i++) {
+          state.x += dx
+          state.y += dy
+          const key = `${state.x},${state.y}`
+          if (visited.has(key)) {
+            p2(Math.abs(state.x) + Math.abs(state.y))
+            return true
+          }
+          visited.add(key)
+        }
+      })
     }
   })
 
@@ -55,13 +89,6 @@ if (!globalThis.window) globalThis.window = globalThis
         }
       }
       return xs[min_i]
-    },
-    group: (xs, n) => {
-      const groups = []
-      for (let i = 0; i < xs.length; i += n) {
-        groups.push(xs.slice(i, Math.min(xs.length, i + n)))
-      }
-      return groups
     },
     sum: (ar, func) => ar.reduce((sum, val) => sum + U.opt(val, func), 0),
     product: (ar, func) => ar.reduce((prod, val) => prod * U.opt(val, func), 1),

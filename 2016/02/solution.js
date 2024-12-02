@@ -1,17 +1,42 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
-    if (1) {
-      let rs = lines.map(x => {
-        
-      })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+    const DIRS = {
+      U: { x: 0, y: -1 },
+      D: { x: 0, y: 1 },
+      L: { x: -1, y: 0 },
+      R: { x: 1, y: 0 },
     }
     if (1) {
-      
-      p2()
+      const keypad = ['123', '456', '789']
+      let pos = { x:1, y:1 }
+      let rs = lines.map(x => {
+        ;[...x].map(dir => {
+          const { x, y } = DIRS[dir]
+          pos.x = Math.max(0, Math.min(pos.x + x, 2))
+          pos.y = Math.max(0, Math.min(pos.y + y, 2))
+        })
+        return keypad[pos.y][pos.x]
+      })
+      p1(rs.join(''))
+    }
+    if (1) {
+      const keypad = ['  1  ', ' 234 ', '56789', ' ABC ', '  D  ']
+      const get = (x, y) => (keypad[y]?.[x] || ' ').trim()
+      let pos = { x:0, y:2 }
+      let rs = lines.map(x => {
+        ;[...x].map(dir => {
+          const { x, y } = DIRS[dir]
+          const nx = pos.x + x
+          const ny = pos.y + y
+          if (get(nx, ny)) {
+            pos.x = nx
+            pos.y = ny
+          }
+        })
+        return keypad[pos.y][pos.x]
+      })
+      p2(rs.join(''))
     }
   })
 
@@ -56,13 +81,6 @@ if (!globalThis.window) globalThis.window = globalThis
       }
       return xs[min_i]
     },
-    group: (xs, n) => {
-      const groups = []
-      for (let i = 0; i < xs.length; i += n) {
-        groups.push(xs.slice(i, Math.min(xs.length, i + n)))
-      }
-      return groups
-    },
     sum: (ar, func) => ar.reduce((sum, val) => sum + U.opt(val, func), 0),
     product: (ar, func) => ar.reduce((prod, val) => prod * U.opt(val, func), 1),
     match: (strs, regex, func) => strs.map(str => U.opt(str.match(regex), func)),
@@ -84,6 +102,8 @@ if (!globalThis.window) globalThis.window = globalThis
   const entries = U.e
   const from = U.f
   const range = U.range
+  const list = U.list
+  const set = U.set
   window.U = U
 
   // https://github.com/datastructures-js/priority-queue

@@ -2,16 +2,26 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     if (1) {
-      let rs = lines.map(x => {
-        
+      const lists = range(lines[0].length).map(i => [])
+      lines.map(x => {
+        Array.from(x).map((c, i) => lists[i].push(c))
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      const rs = lists.map(list => {
+        const counts = U.count(list)
+        return U.maxxing(keys(counts), k => counts[k])
+      })
+      p1(rs.join(''))
     }
     if (1) {
-      
-      p2()
+      const lists = range(lines[0].length).map(i => [])
+      lines.map(x => {
+        Array.from(x).map((c, i) => lists[i].push(c))
+      })
+      const rs = lists.map(list => {
+        const counts = U.count(list)
+        return U.minning(keys(counts), k => counts[k])
+      })
+      p2(rs.join(''))
     }
   })
 

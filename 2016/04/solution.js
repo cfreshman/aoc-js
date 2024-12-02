@@ -3,15 +3,36 @@ if (!globalThis.window) globalThis.window = globalThis
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     if (1) {
       let rs = lines.map(x => {
-        
+        const match = x.match(/^(.+)-(\d+)\[(\w+)\]$/)
+        let [_, lets, id, check] = match
+
+        lets = [...lets.replaceAll('-', '')]
+        const counts = U.count(lets)
+        lets = [...new Set(lets)].sort().sort((a, b) => counts[b] - counts[a])
+        if (lets.slice(0, 5).join('') === check) return Number(id)
+        return 0
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      p1(U.sum(rs))
     }
     if (1) {
-      
-      p2()
+      const a_code = 'a'.charCodeAt(0)
+      let rs = lines.map(x => {
+        const match = x.match(/^(.+)-(\d+)\[(\w+)\]$/)
+        let [_, lets, id, check] = match
+
+        const original_lets = lets
+        lets = [...lets.replaceAll('-', '')]
+        const counts = U.count(lets)
+        lets = [...new Set(lets)].sort().sort((a, b) => counts[b] - counts[a])
+        if (lets.slice(0, 5).join('') === check) return [original_lets, Number(id)]
+        return undefined
+      }).filter(x => x)
+      rs = rs.map(([lets, id]) => {
+        const shifted = [...lets].map(c => c === '-' ? ' ' : String.fromCharCode((c.charCodeAt(0) - a_code + id) % 26 + a_code)).join('')
+        // l(shifted, id)
+        return [shifted, id]
+      })
+      p2(rs.find(([name, id]) => name.includes('north'))[1])
     }
   })
 
