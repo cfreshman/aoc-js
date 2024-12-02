@@ -9,5 +9,8 @@
     "test": "node index.js test",
     "save": "node index.js save $@",
     "load": "node index.js load $@"
+  },
+  "dependencies": {
+    "@datastructures-js/priority-queue": "^6.3.1"
   }
 }

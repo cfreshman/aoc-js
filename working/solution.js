@@ -1,7 +1,7 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
-    {
+    if (1) {
       let rs = lines.map(x => {
         
       })
@@ -9,7 +9,7 @@ if (!globalThis.window) globalThis.window = globalThis
       // p1(U.sum(rs))
       // p1(U.product(rs))
     }
-    {
+    if (1) {
       
       p2()
     }
@@ -78,5 +78,12 @@ if (!globalThis.window) globalThis.window = globalThis
   const from = U.f
   const range = U.range
   window.U = U
+
+  // https://github.com/datastructures-js/priority-queue
+  const {
+    PriorityQueue,
+    MinPriorityQueue,
+    MaxPriorityQueue,
+  } = require('@datastructures-js/priority-queue')
 })()
 module.exports = solution

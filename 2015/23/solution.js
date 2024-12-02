@@ -2,16 +2,57 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     if (1) {
-      let rs = lines.map(x => {
-        
+      const reg = {
+        a: 0,
+        b: 0,
+        i: 0,
+      }
+      const inst = {
+        hlf: (r) => reg[r] /= 2,
+        tpl: (r) => reg[r] *= 3,
+        inc: (r) => reg[r]++,
+        jmp: (offset) => reg.i += offset - 1,
+        jie: (r, offset) => reg[r] % 2 === 0 && inst.jmp(offset),
+        jio: (r, offset) => reg[r] === 1 && inst.jmp(offset),
+      }
+      const insts = lines.map(x => {
+        let [_, op, args] = /(\w+) (.+)/.exec(x)
+        args = args.split(/, */).map(x => isNaN(Number(x)) ? x : Number(x))
+        return { op, args }
       })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      // l(insts)
+      while (reg.i > -1 && reg.i < insts.length) {
+        const { op, args } = insts[reg.i]
+        inst[op](...args)
+        reg.i++
+      }
+      p1(reg.b)
     }
     if (1) {
-      
-      p2()
+      const reg = {
+        a: 1,
+        b: 0,
+        i: 0,
+      }
+      const inst = {
+        hlf: (r) => reg[r] /= 2,
+        tpl: (r) => reg[r] *= 3,
+        inc: (r) => reg[r]++,
+        jmp: (offset) => reg.i += offset - 1,
+        jie: (r, offset) => reg[r] % 2 === 0 && inst.jmp(offset),
+        jio: (r, offset) => reg[r] === 1 && inst.jmp(offset),
+      }
+      const insts = lines.map(x => {
+        let [_, op, args] = /(\w+) (.+)/.exec(x)
+        args = args.split(/, */).map(x => isNaN(Number(x)) ? x : Number(x))
+        return { op, args }
+      })
+      while (reg.i > -1 && reg.i < insts.length) {
+        const { op, args } = insts[reg.i]
+        inst[op](...args)
+        reg.i++
+      }
+      p2(reg.b)
     }
   })
 
@@ -78,12 +119,5 @@ if (!globalThis.window) globalThis.window = globalThis
   const from = U.f
   const range = U.range
   window.U = U
-
-  // https://github.com/datastructures-js/priority-queue
-  const {
-    PriorityQueue,
-    MinPriorityQueue,
-    MaxPriorityQueue,
-  } = require('@datastructures-js/priority-queue')
 })()
 module.exports = solution

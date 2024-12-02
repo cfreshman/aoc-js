@@ -2,12 +2,22 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     if (1) {
-      let rs = lines.map(x => {
-        
-      })
-      p1()
-      // p1(U.sum(rs))
-      // p1(U.product(rs))
+      const row = Number(/row (\d+)/.exec(input)[1])
+      const col = Number(/column (\d+)/.exec(input)[1])
+      // l(row, col)
+      const pos = { x:1, y:1, value:20151125 }
+      const move = () => {
+        if (pos.y === 1) {
+          pos.y = pos.x + 1
+          pos.x = 1
+        } else {
+          pos.x++
+          pos.y--
+        }
+        pos.value = (pos.value * 252533) % 33554393
+      }
+      while (pos.x !== col || pos.y !== row) move()
+      p1(pos.value)
     }
     if (1) {
       
@@ -78,12 +88,5 @@ if (!globalThis.window) globalThis.window = globalThis
   const from = U.f
   const range = U.range
   window.U = U
-
-  // https://github.com/datastructures-js/priority-queue
-  const {
-    PriorityQueue,
-    MinPriorityQueue,
-    MaxPriorityQueue,
-  } = require('@datastructures-js/priority-queue')
 })()
 module.exports = solution
