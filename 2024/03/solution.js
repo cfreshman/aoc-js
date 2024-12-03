@@ -2,26 +2,24 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
-      let muls = A(ii.MA(/mul\((\d{1,3}),(\d{1,3})\)/)).M(A).M(m => m.S(1).N())
-      // l(muls)
-      let rs = muls.M(([a, b]) => a * b)
+      const muls = ii.re(/mul\((\d{1,3}),(\d{1,3})\)/g).m(m => A(m).s(1).num)
+      const rs = muls.m(([a, b]) => a * b)
       p1(sum(rs))
     }
     if (1) {
-      let muls = A(ii.MA(/do\(\)|don't\(\)|mul\((\d{1,3}),(\d{1,3})\)/)).M(A).M(m => m[1] ? ['mul', m.S(1).N()] : [m[0]])
-      // l(muls)
-      let DO = true
-      let rs = muls.M(([i, [a, b]=[]]) => {
-        if (i === `do()`) DO = true
-        else if (i === `don't()`) DO = false
-        else if (DO) return a * b
+      const insts = ii.re(/do\(\)|don't\(\)|mul\((\d{1,3}),(\d{1,3})\)/g).m(m => m[1] ? ['mul', A(m).s(1).num] : [m[0]])
+      let on = true
+      const rs = insts.m(([type, [a, b]=[]]) => {
+        if (type === `do()`) on = true
+        else if (type === `don't()`) on = false
+        else if (on) return a * b
         return 0
       })
       p2(sum(rs))
     }
   })
 
-  const l = console.log
+  const l = console.log, L = l
   const U = {
     opt: (val, func) => func ? func(val) : val,
     apply: (val, func) => func(val),
@@ -31,9 +29,11 @@ if (!globalThis.window) globalThis.window = globalThis
     v: (ob, func) => U.opt(Object.values(ob), func),
     e: (ob, func) => U.opt(Object.entries(ob), func),
     f: (ar) => Object.fromEntries(ar),
-    a: (o) => Array.from(o),
-    n: (o) => typeof o === 'string' ? Number(o) : U.a(o).map(Number),
-    list: (str, sep) => typeof str === 'string' ? str.split(sep || ' ') : Array.from(str),
+    a: (o, f=x=>x) => Array.from(o).map(f),
+    an: (n, f=x=>x) => Array.from({ length: n }).map(f),
+    stringish: (o) => typeof o === 'string' || o instanceof String,
+    n: (o) => U.stringish(o) ? Number(o) : U.a(o).map(Number),
+    list: (str, sep) => U.stringish(o) ? str.split(sep || ' ') : Array.from(str),
     set: (str, sep) => new Set(U.list(str, sep)),
     merge: obs => Object.assign({}, ...obs),
     omap: (ob, func) => Object.entries(ob).map(entry => func(...entry)),
@@ -74,9 +74,13 @@ if (!globalThis.window) globalThis.window = globalThis
     sum: (ar, func) => ar.reduce((sum, val) => sum + U.opt(val, func), 0),
     product: (ar, func) => ar.reduce((prod, val) => prod * U.opt(val, func), 1),
     match: (strs, regex, func) => strs.map(str => U.opt(str.match(regex), func)),
+    rs: (re, str) => {
+      if (re.global) return Array.from(str.matchAll(re))
+      return re.exec(str)
+    },
     union: (a, b) => new Set(...a, ...b),
-    splice: (ar, i, nX, ...items) =>
-      U.use(ar.slice(), copy => copy.splice(i, nX, ...items)),
+    splice: (ar, i, nX, ...items) => U.use(ar.slice(), copy => copy.splice(i, nX, ...items)),
+    wrap: (i, n) => (i % n + n) % n,
     range: (start, stop, step) => {
       if (step === undefined) step = 1;
       if (stop === undefined) [stop, start] = [start, 0];
@@ -84,21 +88,24 @@ if (!globalThis.window) globalThis.window = globalThis
     },
     count: ar => U.use({}, counts => ar.map(e => { counts[e] = 1 + (counts[e] || 0); })),
     diff: ar => ar.slice(1).map((val, i) => val - ar[i]),
+    clone: (ob) => JSON.parse(JSON.stringify(ob)),
     array: (length, func = () => 0) => Array.from({ length }).map((_, i) => func(i)),
     answer: (input, func) => U.use({}, answers => func(input.split('\n'), ...['1', '2'].map(pN => aN => { l(pN, aN); answers[pN] = aN; }))),
   }
-  const keys = U.k
-  const values = U.v
-  const entries = U.e
-  const from = U.f
-  const range = U.range
+  const keys = U.k, K = keys
+  const values = U.v, V = values
+  const entries = U.e, E = entries
+  const from = U.f, F = from
+  const range = U.range, R = range
   const sum = U.sum
   const product = U.product
   const max = U.maxxing
   const min = U.minning
   const A = U.a
+  const An = U.an
   const N = U.n
   const M = U.match
+  const RS = U.rs
   window.U = U
 
   // https://github.com/datastructures-js/priority-queue
@@ -108,14 +115,37 @@ if (!globalThis.window) globalThis.window = globalThis
     MaxPriorityQueue: PQX,
   } = require('@datastructures-js/priority-queue')
 
-  Array.prototype.N = function() { return U.n(this) }
-  Array.prototype.S = function(...xs) { return this.slice(...xs) }
-  Array.prototype.L = function() { return this.length }
+  Object.defineProperties(Array.prototype, {
+    n: { get() { return this.length } },
+    num: { get() { return U.n(this) } },
+    numsort: { get() { return U.numsort(this.num) } },
+    c: { get() { return U.a(this) } },
+    sum: { get() { return U.sum(this) } },
+    product: { get() { return U.product(this) } },
+    last: { get() { return this[this.n - 1] } },
+    first: { get() { return this[0] } },
+
+    i: { value(i) { return U.i(i) } },
+    is: { value(i, x) { return this.i(i) === x } },
+    m: { value(f) { return this.map(f) } },
+    s: { value(...xs) { return this.slice(...xs) } },
+  })
   Array.prototype.M = function(f) { return this.map(f) }
-  String.prototype.N = function() { return U.n(this) }
-  String.prototype.C = function() { return U.a(this) }
-  String.prototype.M = function(re) { return this.match(re) }
-  String.prototype.MA = function(re) { return this.matchAll(new RegExp(re, re.flags + 'g')) }
-  String.prototype.L = function() { return this.length }
+
+  Object.defineProperties(String.prototype, {
+    n: { get() { return this.length } },
+    num: { get() { return U.n(this) } },
+    a: { get() { return U.a(this) } },
+
+    i: { value(i) { return U.i(this, i) } },
+    is: { value(i, c) { return this.i(i) === c } },
+    s: { value(...xs) { return this.slice(...xs) } },
+    nums: { value(splitter) { return U.n(splitter ? this.split(splitter) : this) } },
+    re: { value(re) { return U.rs(re, this) } },
+  })
+
+  Object.defineProperties(Number.prototype, {
+    repeat: { value(n) { return An(n).fill(this) } },
+  })
 })()
 module.exports = solution

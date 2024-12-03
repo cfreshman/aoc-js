@@ -84,6 +84,7 @@ if (!globalThis.window) globalThis.window = globalThis
     },
     count: ar => U.use({}, counts => ar.map(e => { counts[e] = 1 + (counts[e] || 0); })),
     diff: ar => ar.slice(1).map((val, i) => val - ar[i]),
+    clone: (ob) => JSON.parse(JSON.stringify(ob)),
     array: (length, func = () => 0) => Array.from({ length }).map((_, i) => func(i)),
     answer: (input, func) => U.use({}, answers => func(input.split('\n'), ...['1', '2'].map(pN => aN => { l(pN, aN); answers[pN] = aN; }))),
   }
@@ -136,11 +137,8 @@ if (!globalThis.window) globalThis.window = globalThis
     is: { value(i, c) { return this.i(i) === c } },
     s: { value(...xs) { return this.slice(...xs) } },
     nums: { value(splitter) { return U.n(splitter ? this.split(splitter) : this) } },
+    re: { value(re) { return U.rs(re, this) } },
   })
-  String.prototype.N = function() { return U.n(this) }
-  String.prototype.C = function() { return U.a(this) }
-  String.prototype.M = function(re) { return this.match(re) }
-  String.prototype.MA = function(re) { return this.matchAll(new RegExp(re, re.flags + 'g')) }
 
   Object.defineProperties(Number.prototype, {
     repeat: { value(n) { return An(n).fill(this) } },

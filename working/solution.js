@@ -1,17 +1,111 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    if (1) {
-      let rs = ll.map(l => {
-
+    let I = []
+    let floors = range(4).map(i => [])
+    const object = (i, chip, type) => ({ i, chip, type })
+    ll.slice(0, -1).map((line, i) => {
+      const [_, items] = RS(/The \w+ floor contains (.+)\./, line)
+      floors[i] = items.split(/, |, and | and /g).map(item => {
+        let match = RS(/an? (\w+)-compatible \w+/, item)
+        if (match) {
+          const [_, type] = match
+          I.push(object(I.length, true, type))
+          return I.length - 1
+        } else {
+          const [_, type] = RS(/an? (\w+) generator/, item)
+          I.push(object(I.length, false, type))
+          return I.length - 1
+        }
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+    })
+    const run = (out) => {
+      const state = {
+        floors,
+        elevator: 0,
+        moves: 0,
+      }
+      const goal_count = sum(floors.map(f => f.length))
+      const frontier = []
+      const explored = new Set()
+      const to_key = (state) => {
+        // state.floors.map(f => f.join(',')).join(',') + ',' + state.elevator
+
+        // HAD TO LOOK UP A HINT - changed key function to prune more states
+        // https://www.reddit.com/r/adventofcode/comments/5hoia9/2016_day_11_solutions/
+        let key = ''
+        state.floors.map(f => {
+          const items = f.map(i => I[i])
+          const chips = items.filter(x => x.chip)
+          const gens = items.filter(x => !x.chip)
+
+          const pairs = chips.filter(x => gens.some(g => g.type === x.type)).map(x => x.type)
+          const un_chips = chips.filter(x => !pairs.some(t => t === x.type))
+          const un_gens = gens.filter(x => !pairs.some(t => t === x.type))
+          key += 'P'.repeat(pairs.length) + un_chips.map(x => x.i).sort().join('') + un_gens.map(x => x.i).sort().join('') + ','
+        })
+        return key + state.elevator
+      }
+      frontier.push(state)
+      while (frontier.length) {
+        const curr = frontier.shift()
+        const k = to_key(curr)
+        if (explored.has(k)) continue
+        explored.add(k)
+        // L(curr)
+        if (curr.floors[3].length === goal_count) {
+          out(curr.moves)
+          break
+        }
+
+        const { floors, elevator } = curr
+        const has = floors[elevator]
+
+        const items = has.map(i => I[i])
+        const chips = items.filter(x => x.chip)
+        const gens = items.filter(x => !x.chip)
+        const un_chips = chips.filter(x => !gens.some(g => g.type === x.type))
+        if (gens.length && un_chips.length) {
+          continue
+        }
+
+        let groups = []
+        for (let i = 0; i < has.n; i++) {
+          groups.push([has[i]])
+          for (let j = i + 1; j < has.n; j++) {
+            groups.push([has[i], has[j]])
+          }
+        }
+        
+        for (let i = elevator - 1; i <= elevator + 1; i += 2) {
+          if (i < 0 || i >= 4) continue
+          if (range(0, i + 1).every(j => !floors[j].length)) continue
+          for (let group of groups) {
+            let new_floors = floors.map(f => f.slice())
+            new_floors[elevator] = new_floors[elevator].filter(item => !group.includes(item))
+            new_floors[i].push(...group)
+            const new_state = {
+              floors: new_floors,
+              elevator: i,
+              moves: curr.moves + 1,
+            }
+            frontier.push(new_state)
+          }
+        }
+      }
+    }
+    if (0) {
+      L(floors)
+      run(p1)      
     }
     if (2) {
-
-      p2()
+      I.push(object(I.length, true, 'elerium'))
+      I.push(object(I.length, false, 'elerium'))
+      I.push(object(I.length, true, 'dilithium'))
+      I.push(object(I.length, false, 'dilithium'))
+      floors[0].push(I.length - 4, I.length - 3, I.length - 2, I.length - 1)
+      L(floors)
+      run(p2)
     }
   })
 
@@ -84,6 +178,7 @@ if (!globalThis.window) globalThis.window = globalThis
     },
     count: ar => U.use({}, counts => ar.map(e => { counts[e] = 1 + (counts[e] || 0); })),
     diff: ar => ar.slice(1).map((val, i) => val - ar[i]),
+    clone: (ob) => JSON.parse(JSON.stringify(ob)),
     array: (length, func = () => 0) => Array.from({ length }).map((_, i) => func(i)),
     answer: (input, func) => U.use({}, answers => func(input.split('\n'), ...['1', '2'].map(pN => aN => { l(pN, aN); answers[pN] = aN; }))),
   }
