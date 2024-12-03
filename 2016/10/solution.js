@@ -2,16 +2,48 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
-      let rs = ll.map(l => {
-
+      const bots = {} // { chips, low, high }
+      const outputs = {} // []
+      ll.map(line => {
+        let match = RS(/value (\d+) goes to bot (\d+)/, line)
+        if (match) {
+          let [_, value, bot] = match
+          bots[bot] = bots[bot] || { chips: [], low: undefined, high: undefined }
+          bots[bot].chips.push(value.num)
+        } else {
+          match = RS(/bot (\d+) gives low to (\w+) (\d+) and high to (\w+) (\d+)/, line)
+          let [_, bot, low_type, low, high_type, high] = match
+          bots[bot] = bots[bot] || { chips: [], low: undefined, high: undefined }
+          bots[bot].low = { type: low_type, to: low.num }
+          bots[bot].high = { type: high_type, to: high.num }
+        }
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      const give = (bot) => {
+        let b = bots[bot]
+        if (b.chips.length === 2) {
+          let [low, high] = b.chips.numsort
+          if (low === 17 && high === 61) {
+            p1(bot)
+          }
+          if (b.low.type === 'bot') {
+            bots[b.low.to].chips.push(low)
+            give(b.low.to)
+          } else {
+            outputs[b.low.to] = low
+          }
+          if (b.high.type === 'bot') {
+            bots[b.high.to].chips.push(high)
+            give(b.high.to)
+          } else {
+            outputs[b.high.to] = high
+          }
+        }
+      }
+      const bot_2s = U.k(bots).filter(bot => bots[bot].chips.length === 2)
+      bot_2s.map(bot => give(bot, bots[bot].chips))
+      p2(outputs[0] * outputs[1] * outputs[2])
     }
     if (2) {
-
-      p2()
     }
   })
 

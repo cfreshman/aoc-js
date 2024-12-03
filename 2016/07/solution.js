@@ -1,21 +1,45 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
-  window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+  window.solution = (input) => U.answer(input, (lines, p1, p2) => {
     if (1) {
-      let rs = ll.map(l => {
-
+      let rs = lines.filter(x => {
+        let window = false, has_abba = false
+        for (let i = 0; i < x.length - 3; i++) {
+          const a = x[i], b = x[i + 1], c = x[i + 2], d = x[i + 3]
+          if (a === '[') window = true
+          else if (a === ']') window = false
+          else if (!window && a === d && b === c && a !== b) has_abba = true
+          else if (window && a === d && b === c && a !== b) return false
+        }
+        return has_abba
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      p1(rs.length)
     }
-    if (2) {
+    if (1) {
+      let rs = lines.filter(x => {
+        const windows = Array.from(x.matchAll(/\[([^\]]+)\]/g)).map(x => x[1])
+        const abas = []
+        windows.map(window => {
+          for (let i = 0; i < window.length - 2; i++) {
+            const a = window[i], b = window[i + 1], c = window[i + 2]
+            if (a === c && a !== b) abas.push(b + a + b)
+          }
+        })
+        if (!abas.length) return false
 
-      p2()
+        let window = false, has_aba = false
+        for (let i = 0; i < x.length - 2; i++) {
+          if (x[i] === '[') window = true
+          else if (x[i] === ']') window = false
+          else if (!window && abas.some(aba => aba === x.slice(i, i + 3))) has_aba = true
+        }
+        return has_aba
+      })
+      p2(rs.length)
     }
   })
 
-  const l = console.log, L = l
+  const l = console.log
   const U = {
     opt: (val, func) => func ? func(val) : val,
     apply: (val, func) => func(val),
@@ -25,11 +49,7 @@ if (!globalThis.window) globalThis.window = globalThis
     v: (ob, func) => U.opt(Object.values(ob), func),
     e: (ob, func) => U.opt(Object.entries(ob), func),
     f: (ar) => Object.fromEntries(ar),
-    a: (o, f=x=>x) => Array.from(o).map(f),
-    an: (n, f=x=>x) => Array.from({ length: n }).map(f),
-    stringish: (o) => typeof o === 'string' || o instanceof String,
-    n: (o) => U.stringish(o) ? Number(o) : U.a(o).map(Number),
-    list: (str, sep) => U.stringish(o) ? str.split(sep || ' ') : Array.from(str),
+    list: (str, sep) => typeof str === 'string' ? str.split(sep || ' ') : Array.from(str),
     set: (str, sep) => new Set(U.list(str, sep)),
     merge: obs => Object.assign({}, ...obs),
     omap: (ob, func) => Object.entries(ob).map(entry => func(...entry)),
@@ -70,13 +90,9 @@ if (!globalThis.window) globalThis.window = globalThis
     sum: (ar, func) => ar.reduce((sum, val) => sum + U.opt(val, func), 0),
     product: (ar, func) => ar.reduce((prod, val) => prod * U.opt(val, func), 1),
     match: (strs, regex, func) => strs.map(str => U.opt(str.match(regex), func)),
-    rs: (re, str) => {
-      if (re.global) return Array.from(str.matchAll(re))
-      return re.exec(str)
-    },
     union: (a, b) => new Set(...a, ...b),
-    splice: (ar, i, nX, ...items) => U.use(ar.slice(), copy => copy.splice(i, nX, ...items)),
-    wrap: (i, n) => (i % n + n) % n,
+    splice: (ar, i, nX, ...items) =>
+      U.use(ar.slice(), copy => copy.splice(i, nX, ...items)),
     range: (start, stop, step) => {
       if (step === undefined) step = 1;
       if (stop === undefined) [stop, start] = [start, 0];
@@ -87,20 +103,11 @@ if (!globalThis.window) globalThis.window = globalThis
     array: (length, func = () => 0) => Array.from({ length }).map((_, i) => func(i)),
     answer: (input, func) => U.use({}, answers => func(input.split('\n'), ...['1', '2'].map(pN => aN => { l(pN, aN); answers[pN] = aN; }))),
   }
-  const keys = U.k, K = keys
-  const values = U.v, V = values
-  const entries = U.e, E = entries
-  const from = U.f, F = from
-  const range = U.range, R = range
-  const sum = U.sum
-  const product = U.product
-  const max = U.maxxing
-  const min = U.minning
-  const A = U.a
-  const An = U.an
-  const N = U.n
-  const M = U.match
-  const RS = U.rs
+  const keys = U.k
+  const values = U.v
+  const entries = U.e
+  const from = U.f
+  const range = U.range
   window.U = U
 
   // https://github.com/datastructures-js/priority-queue
@@ -109,41 +116,5 @@ if (!globalThis.window) globalThis.window = globalThis
     MinPriorityQueue: PQN,
     MaxPriorityQueue: PQX,
   } = require('@datastructures-js/priority-queue')
-
-  Object.defineProperties(Array.prototype, {
-    n: { get() { return this.length } },
-    num: { get() { return U.n(this) } },
-    numsort: { get() { return U.numsort(this.num) } },
-    c: { get() { return U.a(this) } },
-    sum: { get() { return U.sum(this) } },
-    product: { get() { return U.product(this) } },
-    last: { get() { return this[this.n - 1] } },
-    first: { get() { return this[0] } },
-
-    i: { value(i) { return U.i(i) } },
-    is: { value(i, x) { return this.i(i) === x } },
-    m: { value(f) { return this.map(f) } },
-    s: { value(...xs) { return this.slice(...xs) } },
-  })
-  Array.prototype.M = function(f) { return this.map(f) }
-
-  Object.defineProperties(String.prototype, {
-    n: { get() { return this.length } },
-    num: { get() { return U.n(this) } },
-    a: { get() { return U.a(this) } },
-
-    i: { value(i) { return U.i(this, i) } },
-    is: { value(i, c) { return this.i(i) === c } },
-    s: { value(...xs) { return this.slice(...xs) } },
-    nums: { value(splitter) { return U.n(splitter ? this.split(splitter) : this) } },
-  })
-  String.prototype.N = function() { return U.n(this) }
-  String.prototype.C = function() { return U.a(this) }
-  String.prototype.M = function(re) { return this.match(re) }
-  String.prototype.MA = function(re) { return this.matchAll(new RegExp(re, re.flags + 'g')) }
-
-  Object.defineProperties(Number.prototype, {
-    repeat: { value(n) { return An(n).fill(this) } },
-  })
 })()
 module.exports = solution

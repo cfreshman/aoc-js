@@ -1,17 +1,33 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    const wrap = (i, n) => (i % n + n) % n
     if (1) {
-      let rs = ll.map(l => {
-
+      const S = range(6).map(i => range(50).map(j => 0))
+      ll.map(l => {
+        let [inst, ...args] = l.split(/ /)
+        args = args.join(' ')
+        if (inst === 'rect') {
+          const [w, h] = args.split('x', 2).map(Number)
+          range(h).map(y => range(w).map(x => S[y][x] = 1))
+        } else {
+          const [dir, a2] = args.split('=')
+          const [a, b] = a2.split(' by ').map(Number)
+          if (dir === 'column x') {
+            const curr = range(6).map(i => S[i][a])
+            range(6).map(i => S[i][a] = curr[wrap(i - b, 6)])
+          } else {
+            const curr = range(50).map(i => S[a][i])
+            range(50).map(i => S[a][i] = curr[wrap(i - b, 50)])
+          }
+        }
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
-    }
-    if (2) {
-
+      p1(U.sum(S.M(row => U.sum(row))))
       p2()
+      L(S.M(row => row.map(x => x ? 'O' : ' ').join('')).join('\n'))
+    }
+    if (1) {
+      // p2()
     }
   })
 
@@ -25,11 +41,9 @@ if (!globalThis.window) globalThis.window = globalThis
     v: (ob, func) => U.opt(Object.values(ob), func),
     e: (ob, func) => U.opt(Object.entries(ob), func),
     f: (ar) => Object.fromEntries(ar),
-    a: (o, f=x=>x) => Array.from(o).map(f),
-    an: (n, f=x=>x) => Array.from({ length: n }).map(f),
-    stringish: (o) => typeof o === 'string' || o instanceof String,
-    n: (o) => U.stringish(o) ? Number(o) : U.a(o).map(Number),
-    list: (str, sep) => U.stringish(o) ? str.split(sep || ' ') : Array.from(str),
+    a: (o) => Array.from(o),
+    n: (o) => typeof o === 'string' ? Number(o) : U.a(o).map(Number),
+    list: (str, sep) => typeof str === 'string' ? str.split(sep || ' ') : Array.from(str),
     set: (str, sep) => new Set(U.list(str, sep)),
     merge: obs => Object.assign({}, ...obs),
     omap: (ob, func) => Object.entries(ob).map(entry => func(...entry)),
@@ -70,13 +84,9 @@ if (!globalThis.window) globalThis.window = globalThis
     sum: (ar, func) => ar.reduce((sum, val) => sum + U.opt(val, func), 0),
     product: (ar, func) => ar.reduce((prod, val) => prod * U.opt(val, func), 1),
     match: (strs, regex, func) => strs.map(str => U.opt(str.match(regex), func)),
-    rs: (re, str) => {
-      if (re.global) return Array.from(str.matchAll(re))
-      return re.exec(str)
-    },
     union: (a, b) => new Set(...a, ...b),
-    splice: (ar, i, nX, ...items) => U.use(ar.slice(), copy => copy.splice(i, nX, ...items)),
-    wrap: (i, n) => (i % n + n) % n,
+    splice: (ar, i, nX, ...items) =>
+      U.use(ar.slice(), copy => copy.splice(i, nX, ...items)),
     range: (start, stop, step) => {
       if (step === undefined) step = 1;
       if (stop === undefined) [stop, start] = [start, 0];
@@ -97,10 +107,8 @@ if (!globalThis.window) globalThis.window = globalThis
   const max = U.maxxing
   const min = U.minning
   const A = U.a
-  const An = U.an
   const N = U.n
   const M = U.match
-  const RS = U.rs
   window.U = U
 
   // https://github.com/datastructures-js/priority-queue
@@ -110,40 +118,14 @@ if (!globalThis.window) globalThis.window = globalThis
     MaxPriorityQueue: PQX,
   } = require('@datastructures-js/priority-queue')
 
-  Object.defineProperties(Array.prototype, {
-    n: { get() { return this.length } },
-    num: { get() { return U.n(this) } },
-    numsort: { get() { return U.numsort(this.num) } },
-    c: { get() { return U.a(this) } },
-    sum: { get() { return U.sum(this) } },
-    product: { get() { return U.product(this) } },
-    last: { get() { return this[this.n - 1] } },
-    first: { get() { return this[0] } },
-
-    i: { value(i) { return U.i(i) } },
-    is: { value(i, x) { return this.i(i) === x } },
-    m: { value(f) { return this.map(f) } },
-    s: { value(...xs) { return this.slice(...xs) } },
-  })
+  Array.prototype.N = function() { return U.n(this) }
+  Array.prototype.S = function(...xs) { return this.slice(...xs) }
+  Array.prototype.L = function() { return this.length }
   Array.prototype.M = function(f) { return this.map(f) }
-
-  Object.defineProperties(String.prototype, {
-    n: { get() { return this.length } },
-    num: { get() { return U.n(this) } },
-    a: { get() { return U.a(this) } },
-
-    i: { value(i) { return U.i(this, i) } },
-    is: { value(i, c) { return this.i(i) === c } },
-    s: { value(...xs) { return this.slice(...xs) } },
-    nums: { value(splitter) { return U.n(splitter ? this.split(splitter) : this) } },
-  })
   String.prototype.N = function() { return U.n(this) }
   String.prototype.C = function() { return U.a(this) }
   String.prototype.M = function(re) { return this.match(re) }
   String.prototype.MA = function(re) { return this.matchAll(new RegExp(re, re.flags + 'g')) }
-
-  Object.defineProperties(Number.prototype, {
-    repeat: { value(n) { return An(n).fill(this) } },
-  })
+  String.prototype.L = function() { return this.length }
 })()
 module.exports = solution
