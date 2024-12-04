@@ -1,17 +1,28 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    let run = (rows, answer) => {
+      let floor = ii
+      let safe = floor.ar.f(x => x === '.').n
+      for (let i = 0; i < rows - 1; i++) {
+        let next_floor = ''
+        for (let j = 0; j < floor.n; j++) {
+          let left = floor[j - 1] === '^' ? '^' : '.'
+          let right = floor[j + 1] === '^' ? '^' : '.'
+          next_floor += (left === right) ? '.' : '^'
+        }
+        floor = next_floor
+        safe += floor.ar.f(x => x === '.').n
+      }
+      answer(safe)
+    }
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      let rows = ii.n <= 10 ? 10 : 40
+      run(rows, p1)
     }
     if (2) {
-
-      p2()
+      let rows = ii.n <= 10 ? 10 : 400000
+      run(rows, p2)
     }
   })
 

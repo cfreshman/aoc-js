@@ -1,17 +1,24 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    let discs = ll.map(line => {
+      let [_0, pos, start] = line.match(/Disc #\d+ has (\d+) positions; at time=0, it is at position (\d+)./)
+      return { mod:pos.num, i:start.num }
+    })
+    let run = (answer) => {
+      for (let i = 0;; i++) {
+        if (discs.every((disc, j) => (disc.i + i + j + 1) % disc.mod === 0)) {
+          answer(i)
+          break
+        }
+      }
+    }
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      run(p1)
     }
     if (2) {
-
-      p2()
+      discs.push({ mod:11, i:0 })
+      run(p2)
     }
   })
 
@@ -113,7 +120,7 @@ if (!globalThis.window) globalThis.window = globalThis
       this.x = x
       this.y = y
     }
-    static of = (x, y) => Array.isArray(x) ? new vec(x[0], x[1]) : new vec(x, y)
+    static of = (x, y) => new vec(x, y)
     static from = (ob) => new vec(ob.x, ob.y)
 
     add(v) { return vec.of(this.x + v.x, this.y + v.y) }
@@ -122,12 +129,8 @@ if (!globalThis.window) globalThis.window = globalThis
     div(v) { return vec.of(this.x / v.x, this.y / v.y) }
     mod(v) { return vec.of(this.x % v.x, this.y % v.y) }
     abs() { return vec.of(Math.abs(this.x), Math.abs(this.y)) }
-    manhat(v=undefined) {
-      if (v) return Math.abs(this.x - v.x) + Math.abs(this.y - v.y)
-      return Math.abs(this.x) + Math.abs(this.y)
-    }
+    manhat() { return Math.abs(this.x) + Math.abs(this.y) }
     equal(v) { return this.x === v.x && this.y === v.y }
-    get clone() { return vec.of(this.x, this.y) }
     get key() { return this.x + ',' + this.y }
 
     static _d4 = [[1, 0], [0, 1], [-1, 0], [0, -1]]

@@ -1,17 +1,28 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    let run = (disk, answer) => {
+      let xs = ii
+      while (xs.n < disk) {
+        let a = xs
+        let b = xs.split('').reverse().map(x => x === '0' ? '1' : '0').join('')
+        xs = a + '0' + b
+      }
+      xs = xs.slice(0, disk)
+      let checksum = xs
+      while (checksum.n % 2 === 0) {
+        let pairs = checksum.match(/../g)
+        checksum = pairs.map(pair => pair[0] === pair[1] ? '1' : '0').join('')
+      }
+      answer(checksum)
+    }
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      let disk = ii.n < 10 ? 20 : 272
+      run(disk, p1)
     }
     if (2) {
-
-      p2()
+      let disk = ii.n < 10 ? 20 : 35651584
+      run(disk, p2)
     }
   })
 
@@ -113,7 +124,7 @@ if (!globalThis.window) globalThis.window = globalThis
       this.x = x
       this.y = y
     }
-    static of = (x, y) => Array.isArray(x) ? new vec(x[0], x[1]) : new vec(x, y)
+    static of = (x, y) => new vec(x, y)
     static from = (ob) => new vec(ob.x, ob.y)
 
     add(v) { return vec.of(this.x + v.x, this.y + v.y) }
@@ -122,12 +133,8 @@ if (!globalThis.window) globalThis.window = globalThis
     div(v) { return vec.of(this.x / v.x, this.y / v.y) }
     mod(v) { return vec.of(this.x % v.x, this.y % v.y) }
     abs() { return vec.of(Math.abs(this.x), Math.abs(this.y)) }
-    manhat(v=undefined) {
-      if (v) return Math.abs(this.x - v.x) + Math.abs(this.y - v.y)
-      return Math.abs(this.x) + Math.abs(this.y)
-    }
+    manhat() { return Math.abs(this.x) + Math.abs(this.y) }
     equal(v) { return this.x === v.x && this.y === v.y }
-    get clone() { return vec.of(this.x, this.y) }
     get key() { return this.x + ',' + this.y }
 
     static _d4 = [[1, 0], [0, 1], [-1, 0], [0, -1]]

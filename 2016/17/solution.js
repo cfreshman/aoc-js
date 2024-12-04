@@ -1,17 +1,44 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    if (1) {
-      let rs = ll.map(line => {
 
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+    const DIRS = from(zip('UDLR', [[0, -1], [0, 1], [-1, 0], [1, 0]].map(ve)))
+    const moves_to_pos = (moves) => moves.ar.reduce((pos, move) => pos.add(DIRS[move]), ve(0, 0))
+    const adj = (hash) => hash.slice(0, 4).ar.m((c, i) => c >= 'b' ? 'UDLR'[i] : 0).truthy
+    const VAULT = ve(3, 3)
+    const g = (moves) => moves_to_pos(moves).manhat(VAULT)
+
+    if (1) {
+      let frontier = new PQN(x => x.moves.n + g(x.moves))
+      frontier.push({ moves:'' })
+      while (frontier.n) {
+        const { moves } = frontier.pop()
+        const pos = moves_to_pos(moves)
+        if (pos.x < 0 || pos.x >= 4 || pos.y < 0 || pos.y >= 4) continue
+        if (g(moves) === 0) {
+          p1(moves)
+          break
+        }
+        const hash = U.md5(ii + moves)
+        adj(hash).map(move => frontier.push({ moves: moves + move }))
+      }
     }
     if (2) {
-
-      p2()
+      let frontier = new PQX(x => x.moves.n + g(x.moves))
+      frontier.push({ moves:'' })
+      let max_moves = 0
+      while (frontier.n) {
+        const { moves } = frontier.pop()
+        const pos = moves_to_pos(moves)
+        if (pos.x < 0 || pos.x >= 4 || pos.y < 0 || pos.y >= 4) continue
+        if (g(moves) === 0) {
+          max_moves = Math.max(max_moves, moves.n)
+          continue
+        }
+        const hash = U.md5(ii + moves)
+        adj(hash).map(move => frontier.push({ moves: moves + move }))
+      }
+      p2(max_moves)
     }
   })
 

@@ -2,16 +2,84 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      let prev_1000 = []
+      let found = set()
+      let max_i = 0
+      const search = () => {
+        for (let i = 0;; i++) {
+          const hash = U.md5(ii + i)
+          let match = hash[0]
+          let saved = ''
+          for (let j = 1; j < hash.length; j++) {
+            if (hash[j] !== match[0]) match = hash[j]
+            else {
+              match += hash[j]
+              if (match.length === 3 && !saved) {
+                // save first 3-match for later
+                saved += match
+              }
+              if (match.length === 5) {
+                // search 1000 prev hashes for 3-match
+                const match3 = match.slice(-3)
+                const indices = lists.find_indices(prev_1000, true, prev => prev.includes(match3))
+                for (let index of indices) {
+                  const i_found = i - prev_1000.length + index
+                  found.add(i_found)
+                  if (found.n <= 64) max_i = Math.max(max_i, i_found)
+                  else if (max_i < i - 1000) {
+                    p1(found.ar.numsort[63])
+                    return
+                  }
+                }
+              }
+            }
+          }
+          prev_1000.push(saved)
+          if (prev_1000.n > 1000) prev_1000.shift()
+        }
+      }
+      search()
     }
     if (2) {
-
-      p2()
+      let prev_1000 = []
+      let found = set()
+      let max_i = 0
+      const search = () => {
+        for (let i = 0;; i++) {
+          let hash = ii + i
+          for (let h = 0; h < 2017; h++) {
+            hash = U.md5(hash)
+          }
+          let match = hash[0]
+          let saved = ''
+          for (let j = 1; j < hash.length; j++) {
+            if (hash[j] !== match[0]) match = hash[j]
+            else {
+              match += hash[j]
+              if (match.length === 3 && !saved) {
+                saved += match
+              }
+              if (match.length === 5) {
+                const match3 = match.slice(-3)
+                const indices = lists.find_indices(prev_1000, true, prev => prev.includes(match3))
+                for (let index of indices) {
+                  const i_found = i - prev_1000.length + index
+                  found.add(i_found)
+                  L(found.n, '/ 64')
+                  if (found.n <= 64) max_i = Math.max(max_i, i_found)
+                  else if (max_i < i - 1000) {
+                    p2(found.ar.numsort[63])
+                    return
+                  }
+                }
+              }
+            }
+          }
+          prev_1000.push(saved)
+          if (prev_1000.n > 1000) prev_1000.shift()
+        }
+      }
+      search()
     }
   })
 
@@ -113,7 +181,7 @@ if (!globalThis.window) globalThis.window = globalThis
       this.x = x
       this.y = y
     }
-    static of = (x, y) => Array.isArray(x) ? new vec(x[0], x[1]) : new vec(x, y)
+    static of = (x, y) => new vec(x, y)
     static from = (ob) => new vec(ob.x, ob.y)
 
     add(v) { return vec.of(this.x + v.x, this.y + v.y) }
@@ -122,12 +190,8 @@ if (!globalThis.window) globalThis.window = globalThis
     div(v) { return vec.of(this.x / v.x, this.y / v.y) }
     mod(v) { return vec.of(this.x % v.x, this.y % v.y) }
     abs() { return vec.of(Math.abs(this.x), Math.abs(this.y)) }
-    manhat(v=undefined) {
-      if (v) return Math.abs(this.x - v.x) + Math.abs(this.y - v.y)
-      return Math.abs(this.x) + Math.abs(this.y)
-    }
+    manhat() { return Math.abs(this.x) + Math.abs(this.y) }
     equal(v) { return this.x === v.x && this.y === v.y }
-    get clone() { return vec.of(this.x, this.y) }
     get key() { return this.x + ',' + this.y }
 
     static _d4 = [[1, 0], [0, 1], [-1, 0], [0, -1]]

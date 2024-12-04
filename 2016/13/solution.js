@@ -1,17 +1,55 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    if (1) {
-      let rs = ll.map(line => {
+    const favorite = ii.num
+    const walls = {}
+    const is_wall = (pos) => {
+      const k = pos.key
+      if (walls[k] !== undefined) return walls[k]
+      const { x, y } = pos
+      const n = x*x + 3*x + 2*x*y + y + y*y + favorite
+      const ones = n.bin.ar.num.truthy.n
+      return walls[k] = ones % 2
+    }
 
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+    const goal = ii.n > 2 ? ve(31, 39) : ve(7, 4)
+    const g = (pos) => U.manhat(pos, goal)
+
+    if (1) {
+      const pos = ve(1, 1)
+      const frontier = new PQN(x => x.h)
+      frontier.push({ pos, cost: 0, h: g(pos) })
+      const explored = set()
+      while (frontier.n) {
+        const { pos, cost } = frontier.pop()
+        if (pos.eq(goal)) {
+          p1(cost)
+          break
+        }
+        if (explored.had(pos.key)) continue
+
+        const new_cost = cost + 1
+        pos.n4.f(n => n.x >= 0 && n.y >= 0 && !is_wall(n)).m(n => {
+          frontier.push({ pos:n, cost:new_cost, h:new_cost+g(n) })
+        })
+      }
     }
     if (2) {
+      const pos = ve(1, 1)
+      const frontier = new PQN(x => x.h)
+      frontier.push({ pos, cost: 0, h: g(pos) })
+      const explored = set()
+      while (frontier.n) {
+        const { pos, cost } = frontier.pop()
+        if (explored.had(pos.key)) continue
+        if (cost === 50) continue
 
-      p2()
+        const new_cost = cost + 1
+        pos.n4.f(n => n.x >= 0 && n.y >= 0 && !is_wall(n)).m(n => {
+          frontier.push({ pos:n, cost:new_cost, h:new_cost+g(n) })
+        })
+      }
+      p2(explored.size)
     }
   })
 
@@ -113,7 +151,7 @@ if (!globalThis.window) globalThis.window = globalThis
       this.x = x
       this.y = y
     }
-    static of = (x, y) => Array.isArray(x) ? new vec(x[0], x[1]) : new vec(x, y)
+    static of = (x, y) => new vec(x, y)
     static from = (ob) => new vec(ob.x, ob.y)
 
     add(v) { return vec.of(this.x + v.x, this.y + v.y) }
@@ -122,12 +160,8 @@ if (!globalThis.window) globalThis.window = globalThis
     div(v) { return vec.of(this.x / v.x, this.y / v.y) }
     mod(v) { return vec.of(this.x % v.x, this.y % v.y) }
     abs() { return vec.of(Math.abs(this.x), Math.abs(this.y)) }
-    manhat(v=undefined) {
-      if (v) return Math.abs(this.x - v.x) + Math.abs(this.y - v.y)
-      return Math.abs(this.x) + Math.abs(this.y)
-    }
+    manhat() { return Math.abs(this.x) + Math.abs(this.y) }
     equal(v) { return this.x === v.x && this.y === v.y }
-    get clone() { return vec.of(this.x, this.y) }
     get key() { return this.x + ',' + this.y }
 
     static _d4 = [[1, 0], [0, 1], [-1, 0], [0, -1]]
@@ -209,7 +243,6 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Set.prototype, {
-    n: { get() { return this.size } },
     a: { get() { return Array.from(this) } }, ar: { get() { return this.a } },
     had: { value(x) {
       const had = this.has(x)
