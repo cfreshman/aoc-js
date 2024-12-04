@@ -1,17 +1,33 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
+  // IN PROGRESS
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    const insts = ll.map(line => line.split(' '))
+    const run = (reg) => {
+      for (let i = 0; i < insts.length; i++) {
+        let [inst, x, y] = insts[i]
+        if (inst === 'cpy') {
+          reg[y] = reg[x] ?? x.num
+        } else if (inst === 'inc') {
+          reg[x]++
+        } else if (inst === 'dec') {
+          reg[x]--
+        } else if (inst === 'jnz') {
+          if ((reg[x] ?? x.num) !== 0) {
+            i += y.num - 1
+          }
+        }
+      }
+    }
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      const reg = { a:0, b:0, c:0, d:0 }
+      run(reg)
+      p1(reg.a)
     }
     if (2) {
-
-      p2()
+      const reg = { a:0, b:0, c:1, d:0 }
+      run(reg)
+      p2(reg.a)
     }
   })
 

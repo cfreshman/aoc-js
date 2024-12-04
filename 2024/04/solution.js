@@ -1,17 +1,59 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    const get = (x, y) => ll[y]?.charAt(x) || ''
+    const is = (x, y, c) => get(x, y) === c
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      const DIRS = [
+        [1, 0],
+        [1, 1],
+        [0, 1],
+        [-1, 1],
+        [-1, 0],
+        [-1, -1],
+        [0, -1],
+        [1, -1],
+      ]
+      const target = 'XMAS'
+      let count = 0
+      for (let i = 0; i < ll.length; i++) {
+        for (let j = 0; j < ll[i].length; j++) {
+          for (let k = 0; k < DIRS.length; k++) {
+            const dir = DIRS[k]
+            for (let l = 0; l < target.length; l++) {
+              if (!is(j + l * dir[0], i + l * dir[1], target[l])) break
+              if (l === target.length - 1) count++
+            }
+          }
+        }
+      }
+      p1(count)
     }
     if (2) {
-
-      p2()
+      const DIRS = [
+        [1, 1],
+        [-1, 1],
+        [-1, -1],
+        [1, -1],
+      ]
+      const target = 'MAS'
+      let As = {}
+      for (let i = 0; i < ll.length; i++) {
+        for (let j = 0; j < ll[i].length; j++) {
+          for (let k = 0; k < DIRS.length; k++) {
+            const dir = DIRS[k]
+            for (let l = 0; l < target.length; l++) {
+              if (!is(j + l * dir[0], i + l * dir[1], target[l])) break
+              if (l === target.length - 1) {
+                const k = [j + 1 * dir[0], i + 1 * dir[1]].join(',')
+                if (!As[k]) As[k] = 0
+                As[k]++
+              }
+            }
+          }
+        }
+      }
+      p2(values(As).filter(x => x > 1).length)
     }
   })
 
