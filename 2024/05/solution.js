@@ -1,17 +1,40 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    let [first, second] = ii.split('\n\n').map(x => x.split('\n'))
+    let rules = []
+    first.map(line => {
+      let [a, b] = line.split('|')
+      rules.push([a, b])
+    })
+    let get_broken = (pages) => rules.find(([a, b]) => {
+      let ia = pages.indexOf(a)
+      let ib = pages.indexOf(b)
+      return ia > -1 && ib > -1 && ia > ib
+    })
     if (1) {
-      let rs = ll.map(line => {
-
+      let rs = second.map(line => {
+        let pages = line.split(',')
+        let broken = get_broken(pages)
+        return broken ? 0 : pages[(pages.n - 1) / 2]
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      p1(rs.num.sum)
     }
     if (2) {
-
-      p2()
+      let rs = second.map(line => {
+        let pages = line.split(',')
+        let broken = get_broken(pages)
+        if (!broken) return 0
+        for(; broken; broken = get_broken(pages)) {
+          let [a, b] = broken
+          let ia = pages.indexOf(a)
+          let ib = pages.indexOf(b)
+          pages.splice(ia, 1)
+          pages.splice(ib, 0, a)
+        }
+        return pages[(pages.n - 1) / 2]
+      })
+      p2(rs.num.sum)
     }
   })
 
@@ -136,7 +159,7 @@ if (!globalThis.window) globalThis.window = globalThis
     dot(v) { return this.x * v.x + this.y * v.y }
     cross(v) { return this.x * v.y - this.y * v.x }
     proj(v) { return this.dot(v) / v.length }
-    get length() { return Math.hypot(this.x, this.y) }
+    get length() { return Math.sqrt(this.x ** 2 + this.y ** 2) }
     get angle() { return Math.atan2(this.y, this.x) }
     get unit() { return this.div(vec.of(this.length, this.length)) }
     get neg() { return vec.of(-this.x, -this.y) }

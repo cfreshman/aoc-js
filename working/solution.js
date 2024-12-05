@@ -110,10 +110,13 @@ if (!globalThis.window) globalThis.window = globalThis
 
   const vec = class {
     constructor(x, y) {
+      if (Array.isArray(x)) {
+        ;[x, y] = x
+      }
       this.x = x
       this.y = y
     }
-    static of = (x, y) => Array.isArray(x) ? new vec(x[0], x[1]) : new vec(x, y)
+    static of = (x, y) => new vec(x, y)
     static from = (ob) => new vec(ob.x, ob.y)
 
     add(v) { return vec.of(this.x + v.x, this.y + v.y) }
@@ -122,11 +125,21 @@ if (!globalThis.window) globalThis.window = globalThis
     div(v) { return vec.of(this.x / v.x, this.y / v.y) }
     mod(v) { return vec.of(this.x % v.x, this.y % v.y) }
     abs() { return vec.of(Math.abs(this.x), Math.abs(this.y)) }
+    dist(v) { return Math.hypot(this.x - v.x, this.y - v.y) }
     manhat(v=undefined) {
       if (v) return Math.abs(this.x - v.x) + Math.abs(this.y - v.y)
       return Math.abs(this.x) + Math.abs(this.y)
     }
     equal(v) { return this.x === v.x && this.y === v.y }
+    rotate(angle) { return vec.of(this.x * Math.cos(angle) - this.y * Math.sin(angle), this.x * Math.sin(angle) + this.y * Math.cos(angle)) }
+    scale(s) { return vec.of(this.x * s, this.y * s) }
+    dot(v) { return this.x * v.x + this.y * v.y }
+    cross(v) { return this.x * v.y - this.y * v.x }
+    proj(v) { return this.dot(v) / v.length }
+    get length() { return Math.hypot(this.x, this.y) }
+    get angle() { return Math.atan2(this.y, this.x) }
+    get unit() { return this.div(vec.of(this.length, this.length)) }
+    get neg() { return vec.of(-this.x, -this.y) }
     get clone() { return vec.of(this.x, this.y) }
     get key() { return this.x + ',' + this.y }
 
@@ -157,17 +170,18 @@ if (!globalThis.window) globalThis.window = globalThis
     n: { get() { return this.length } },
     num: { get() { return U.n(this) } },
     numsort: { get() { return U.numsort(this.num) } },
-    c: { get() { return U.a(this) } },
+    clone: { get() { return U.a(this) } },
     sum: { get() { return U.sum(this) } },
     product: { get() { return U.product(this) } },
-    last: { get() { return this[this.n - 1] } },
     first: { get() { return this[0] } },
+    last: { get() { return this[this.n - 1] } },
     truthy: { get() { return this.filter(x => x) } },
     defined: { get() { return this.filter(x => x !== undefined) } },
     min: { get() { return min(this) } },
     max: { get() { return max(this) } },
     key: { get() { return this.join(',') } },
     str: { get() { return this.join('') } },
+    set: { get() { return new Set(this) } },
     
     i: { value(i) { return U.i(i) } },
     is: { value(i, x) { return this.i(i) === x } },
@@ -205,10 +219,8 @@ if (!globalThis.window) globalThis.window = globalThis
     re: { value(re) { return U.rs(re, this) } },
     refs: { value(re, ...fs) {
       const result = U.rs(re, this)
-      if (re.global) {
-        return result.map(match => Array.from(match).slice(1).map((x, i) => fs[i](x)))
-      }
-      return Array.from(result).slice(1).map((x, i) => fs[i](x))
+      const apply = (match) => Array.from(match).slice(1).map((x, i) => fs[i](x))
+      return re.global ? result.map(apply) : apply(result)
     } }
   })
 
