@@ -1,17 +1,45 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    const run = (insts, reg) => {
+      for (let i = 0; i < insts.length; i++) {
+        let [inst, x, y] = insts[i]
+        if (inst === 'cpy') {
+          if (reg[y] !== undefined) {
+            reg[y] = reg[x] ?? x.num
+          }
+        } else if (inst === 'inc') {
+          reg[x]++
+        } else if (inst === 'dec') {
+          reg[x]--
+        } else if (inst === 'jnz') {
+          if ((reg[x] ?? x.num) !== 0) {
+            i += (reg[y] ?? y.num) - 1
+          }
+        } else if (inst === 'tgl') {
+          const target = i + (reg[x] ?? x.num)
+          if (insts[target]) {
+            if (insts[target].length === 2) {
+              insts[target][0] = insts[target][0] === 'inc' ? 'dec' : 'inc'
+            } else {
+              insts[target][0] = insts[target][0] === 'jnz' ? 'cpy' : 'jnz'
+            }
+          }
+        }
+      }
+    }
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      const insts = ll.map(line => line.split(' '))
+      const reg = ii.n < 10 ? { a:0 } : { a:7, b:0, c:0, d:0 }
+      run(insts, reg)
+      p1(reg.a)
     }
     if (2) {
-
-      p2()
+      L('warning - slow')
+      const insts = ll.map(line => line.split(' '))
+      const reg = ii.n < 10 ? { a:0 } : { a:12, b:0, c:0, d:0 }
+      run(insts, reg)
+      p2(reg.a)
     }
   })
 

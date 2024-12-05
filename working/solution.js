@@ -103,8 +103,8 @@ if (!globalThis.window) globalThis.window = globalThis
   const min = U.minning
   const A = U.a
   const An = U.an
-  const N = U.n
-  const M = U.match
+  const NU = U.n
+  const MA = U.match
   const RS = U.rs
   window.U = U
 
@@ -167,12 +167,14 @@ if (!globalThis.window) globalThis.window = globalThis
     min: { get() { return min(this) } },
     max: { get() { return max(this) } },
     key: { get() { return this.join(',') } },
-
+    str: { get() { return this.join('') } },
+    
     i: { value(i) { return U.i(i) } },
     is: { value(i, x) { return this.i(i) === x } },
     m: { value(f) { return this.map(f) } },
     s: { value(...xs) { return this.slice(...xs) } },
     f: { value(f) { return this.filter(f) } },
+    fs: { value(...fs) { return this.map((x, i) => fs[i] ? fs[i](x) : x) } }
   })
   Array.d4 = () => [
     [1, 0],
@@ -201,6 +203,13 @@ if (!globalThis.window) globalThis.window = globalThis
     s: { value(...xs) { return this.slice(...xs) } },
     nums: { value(splitter) { return U.n(splitter ? this.split(splitter) : this) } },
     re: { value(re) { return U.rs(re, this) } },
+    refs: { value(re, ...fs) {
+      const result = U.rs(re, this)
+      if (re.global) {
+        return result.map(match => Array.from(match).slice(1).map((x, i) => fs[i](x)))
+      }
+      return Array.from(result).slice(1).map((x, i) => fs[i](x))
+    } }
   })
 
   Object.defineProperties(Number.prototype, {

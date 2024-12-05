@@ -1,17 +1,32 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    const vmax = ll.length <= 3 ? 9 : 4294967295
+    const ranges = ll.map(line => line.split('-').num)
+    ranges.sort((a, b) => a[0] - b[0])
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      let [min, max] = ranges[0]
+      for (let i = 1; i < ranges.length; i++) {
+        const [a, b] = ranges[i]
+        if (a > max + 1) {
+          p1(max + 1)
+          break
+        }
+        max = Math.max(max, b)
+      }
     }
     if (2) {
-
-      p2()
+      let [min, max] = ranges[0]
+      let count = 0
+      for (let i = 1; i < ranges.length; i++) {
+        const [a, b] = ranges[i]
+        if (a > max + 1) {
+          count += a - max - 1
+        }
+        max = Math.max(max, b)
+      }
+      count += vmax - max
+      p2(count)
     }
   })
 
@@ -103,8 +118,8 @@ if (!globalThis.window) globalThis.window = globalThis
   const min = U.minning
   const A = U.a
   const An = U.an
-  const NU = U.n
-  const MA = U.match
+  const N = U.n
+  const M = U.match
   const RS = U.rs
   window.U = U
 
@@ -167,14 +182,12 @@ if (!globalThis.window) globalThis.window = globalThis
     min: { get() { return min(this) } },
     max: { get() { return max(this) } },
     key: { get() { return this.join(',') } },
-    str: { get() { return this.join('') } },
-    
+
     i: { value(i) { return U.i(i) } },
     is: { value(i, x) { return this.i(i) === x } },
     m: { value(f) { return this.map(f) } },
     s: { value(...xs) { return this.slice(...xs) } },
     f: { value(f) { return this.filter(f) } },
-    fs: { value(...fs) { return this.map((x, i) => fs[i] ? fs[i](x) : x) } }
   })
   Array.d4 = () => [
     [1, 0],
@@ -203,13 +216,6 @@ if (!globalThis.window) globalThis.window = globalThis
     s: { value(...xs) { return this.slice(...xs) } },
     nums: { value(splitter) { return U.n(splitter ? this.split(splitter) : this) } },
     re: { value(re) { return U.rs(re, this) } },
-    refs: { value(re, ...fs) {
-      const result = U.rs(re, this)
-      if (re.global) {
-        return result.map(match => Array.from(match).slice(1).map((x, i) => fs[i](x)))
-      }
-      return Array.from(result).slice(1).map((x, i) => fs[i](x))
-    } }
   })
 
   Object.defineProperties(Number.prototype, {

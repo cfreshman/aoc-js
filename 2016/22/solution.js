@@ -2,16 +2,43 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
-      let rs = ll.map(line => {
-
+      let ln = ll.slice(2)
+      let nodes = ln.map(line => {
+        let match = line.re(/\/dev\/grid\/node-x(\d+)-y(\d+)\s+(\d+)T\s+(\d+)T\s+(\d+)T/)
+        let [x, y, size, used, avail] = A(match.slice(1)).m(Number)
+        return { x, y, size, used, avail }
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      let pairs = []
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          let a = nodes[i], b = nodes[j]
+          if (a.used && a.used <= b.avail) pairs.push([a, b])
+          if (b.used && b.used <= a.avail) pairs.push([b, a])
+        }
+      }
+      p1(pairs.length)
     }
     if (2) {
-
-      p2()
+      let ln = ll.slice(2)
+      let nodes = ln.map(line => {
+        let match = line.re(/\/dev\/grid\/node-x(\d+)-y(\d+)\s+(\d+)T\s+(\d+)T\s+(\d+)T/)
+        let [x, y, size, used, avail] = A(match.slice(1)).m(Number)
+        return { x, y, size, used, avail }
+      })
+      let pairs = []
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          let a = nodes[i], b = nodes[j]
+          if (a.used && a.used <= b.avail) pairs.push([a, b])
+          if (b.used && b.used <= a.avail) pairs.push([b, a])
+        }
+      }
+      let xmax = max(nodes.m(n => n.x))
+      let ymax = max(nodes.m(n => n.y))
+      let grid = An(ymax + 1, () => An(xmax + 1, () => 0))
+      nodes.map(n => grid[n.y][n.x] = n)
+      L(grid.map((row, ri) => row.map(n => n.used > 100 ? '#' : n.used === 0 ? '_' : n.x === xmax && !n.y ? 'G' : !n.x && !n.y ? 'S' : '.').join(' ') + ' ' + ri).join('\n'))
+      p2('do it by hand :)')
     }
   })
 

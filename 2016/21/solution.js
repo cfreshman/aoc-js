@@ -2,16 +2,104 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
-      let rs = ll.map(line => {
-
+      const str = ll.length < 10 ? 'abcde' : 'abcdefgh'
+      let ar = str.ar
+      ll.map(line => {
+        let match
+        if (match = /swap position (\d+) with position (\d+)/.exec(line)) {
+          const [a, b] = match.s(1).num
+          ;[ar[a], ar[b]] = [ar[b], ar[a]]
+        } else if (match = /swap letter (\w) with letter (\w)/.exec(line)) {
+          const [a, b] = match.s(1)
+          ar = ar.map(x => x === a ? b : x === b ? a : x)
+        } else if (match = /rotate (left|right) (\d+) steps?/.exec(line)) {
+          let [dir, n] = match.s(1).fs(x => x === 'left' ? -1 : 1, Number)
+          ar = ar.map((_, i) => ar[((i - dir * n) + ar.n) % ar.n])
+        } else if (match = /rotate based on position of letter (\w)/.exec(line)) {
+          const [a] = match.s(1)
+          let i = ar.indexOf(a)
+          let n = i + (i >= 4 ? 2 : 1)
+          ar = ar.map((_, i) => ar[(i - n + ar.n * 2) % ar.n])
+        } else if (match = /reverse positions (\d+) through (\d+)/.exec(line)) {
+          const [a, b] = match.s(1).num
+          ar = [].concat(ar.s(0, a), ar.s(a, b+1).reverse(), ar.s(b+1))
+        } else if (match = /move position (\d+) to position (\d+)/.exec(line)) {
+          const [a, b] = match.s(1).num
+          const x = ar.splice(a, 1)[0]
+          ar.splice(b, 0, x)
+        }
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      p1(ar.str)
     }
     if (2) {
-
-      p2()
+      const str = ll.length < 10 ? 'decab' : 'fbgdceah'
+      let ar = str.ar.sort()
+      let start_set = new Set(), used = new Set()
+      let recurse = (pre='') => {
+        if (pre.n === ar.n) {
+          start_set.add(pre)
+          return
+        }
+        for (let x of ar) {
+          if (used.has(x)) continue
+          used.add(x)
+          recurse(pre + x)
+          used.delete(x)
+        }
+      }
+      recurse()
+      let starts = start_set.ar
+      for (let start of starts) {
+        let ar = start.ar
+        ll.map(line => {
+          let match
+          match = /swap position (\d+) with position (\d+)/.exec(line)
+          if (match) {
+            const [a, b] = match.s(1).num
+            ;[ar[a], ar[b]] = [ar[b], ar[a]]
+            return
+          }
+          match = /swap letter (\w) with letter (\w)/.exec(line)
+          if (match) {
+            const [a, b] = match.s(1)
+            ar = ar.map(x => x === a ? b : x === b ? a : x)
+            return
+          }
+          match = /rotate (left|right) (\d+) steps?/.exec(line)
+          if (match) {
+            let [dir, n] = match.s(1)
+            dir = dir === 'left' ? -1 : 1
+            n = n.num
+            ar = ar.map((_, i) => ar[((i - dir * n) + ar.n) % ar.n])
+            return
+          }
+          match = /rotate based on position of letter (\w)/.exec(line)
+          if (match) {
+            const [a] = match.s(1)
+            let i = ar.indexOf(a)
+            let n = i + (i >= 4 ? 2 : 1)
+            ar = ar.map((_, i) => ar[(i - n + ar.n * 2) % ar.n])
+            return
+          }
+          match = /reverse positions (\d+) through (\d+)/.exec(line)
+          if (match) {
+            const [a, b] = match.s(1).num
+            ar = [].concat(ar.s(0, a), ar.s(a, b+1).reverse(), ar.s(b+1))
+            return
+          }
+          match = /move position (\d+) to position (\d+)/.exec(line)
+          if (match) {
+            const [a, b] = match.s(1).num
+            const x = ar.splice(a, 1)[0]
+            ar.splice(b, 0, x)
+            return
+          }
+        })
+        if (ar.str === str) {
+          p2(start)
+          break
+        }
+      }
     }
   })
 
@@ -103,8 +191,8 @@ if (!globalThis.window) globalThis.window = globalThis
   const min = U.minning
   const A = U.a
   const An = U.an
-  const NU = U.n
-  const MA = U.match
+  const N = U.n
+  const M = U.match
   const RS = U.rs
   window.U = U
 

@@ -1,18 +1,49 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    const run = (insts, reg) => {
+      let rs = []
+      for (let i = 0; i < insts.length; i++) {
+        let [inst, x, y] = insts[i]
+        if (inst === 'cpy') {
+          if (reg[y] !== undefined) {
+            reg[y] = reg[x] ?? x.num
+          }
+        } else if (inst === 'inc') {
+          reg[x]++
+        } else if (inst === 'dec') {
+          reg[x]--
+        } else if (inst === 'jnz') {
+          if ((reg[x] ?? x.num) !== 0) {
+            i += (reg[y] ?? y.num) - 1
+          }
+        } else if (inst === 'tgl') {
+          const target = i + (reg[x] ?? x.num)
+          if (insts[target]) {
+            if (insts[target].length === 2) {
+              insts[target][0] = insts[target][0] === 'inc' ? 'dec' : 'inc'
+            } else {
+              insts[target][0] = insts[target][0] === 'jnz' ? 'cpy' : 'jnz'
+            }
+          }
+        } else if (inst === 'out') {
+          rs.push(reg[x] ?? x.num)
+          if (rs.length === 10) return rs
+        }
+      }
+    }
     if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      const insts = ll.map(line => line.split(' '))
+      for (let i = 0;; i++) {
+        const reg = { a:i, b:0, c:0, d:0 }
+        let rs = run(insts, reg)
+        if (rs && rs.every((r, i) => r === i % 2)) {
+          p1(i)
+          break
+        }
+      }
     }
-    if (2) {
-
-      p2()
-    }
+    // THE END of 2016
   })
 
   const l = console.log, L = l

@@ -1,17 +1,76 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    if (1) {
-      let rs = ll.map(line => {
-
+    let goals = {}, start
+    let grid = ll.map((line, ri) => {
+      return line.ar.map((c, ci) => {
+        if (isNaN(c.num)) return { c }
+        if (c.num === 0) start = ve(ci, ri)
+        else goals[c] = ve(ci, ri)
+        return {
+          c,
+          goal: true,
+        }
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+    })
+    const astar = (start, goal) => {
+      const g = (pos) => pos.manhat(goal)
+      const pq = new PQN(x => x.h)
+      const visited = new Set()
+      pq.push({ pos: start, cost: 0, h: g(start) })
+      while (pq.n) {
+        const { pos, cost } = pq.pop()
+        if (pos.equal(goal)) return cost
+        if (visited.had(pos.key)) continue
+        pos.n4.f(n => {
+          const cell = grid[n.y]?.[n.x]
+          if (!cell || cell.c === '#') return
+          const new_cost = cost + 1
+          pq.push({ pos: n, cost: new_cost, h: new_cost + g(n) })
+        })
+      }
+      return []
+    }
+    let goal_ids = keys(goals).sort()
+    let orders = [], used = set()
+    let recurse = (strgoals='') => {
+      if (strgoals.n === goal_ids.n) {
+        orders.push(strgoals)
+        return
+      }
+      goal_ids.m(g => {
+        if (used.has(g)) return
+        used.add(g)
+        recurse(strgoals + g)
+        used.delete(g)
+      })
+    }
+    recurse()
+    orders.sort()
+    if (1) {
+      let rs = orders.m(order => {
+        let moves = 0
+        let pos = start
+        for (let i = 0; i < order.n; i++) {
+          moves += astar(pos, goals[order[i]])
+          pos = goals[order[i]]
+        }
+        return moves
+      })
+      p1(min(rs))
     }
     if (2) {
-
-      p2()
+      let rs = orders.m(order => {
+        let moves = 0
+        let pos = start
+        for (let i = 0; i < order.n; i++) {
+          moves += astar(pos, goals[order[i]])
+          pos = goals[order[i]]
+        }
+        moves += astar(pos, start)
+        return moves
+      })
+      p2(min(rs))
     }
   })
 

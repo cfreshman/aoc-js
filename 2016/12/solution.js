@@ -1,6 +1,5 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
-  // IN PROGRESS
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     const insts = ll.map(line => line.split(' '))
     const run = (reg) => {
@@ -14,7 +13,7 @@ if (!globalThis.window) globalThis.window = globalThis
           reg[x]--
         } else if (inst === 'jnz') {
           if ((reg[x] ?? x.num) !== 0) {
-            i += y.num - 1
+            i += (reg[y] ?? y.num) - 1
           }
         }
       }

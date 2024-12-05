@@ -1,21 +1,20 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
-  // IN PROGRESS
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     let I = []
     let floors = range(4).map(i => [])
-    const object = (i, chip, type) => ({ i, chip, type })
+    const item = (i, chip, type) => ({ i, chip, type })
     ll.slice(0, -1).map((line, i) => {
-      const [_, items] = RS(/The \w+ floor contains (.+)\./, line)
-      floors[i] = items.split(/, |, and | and /g).map(item => {
-        let match = RS(/an? (\w+)-compatible \w+/, item)
+      const [_, raw_items] = RS(/The \w+ floor contains (.+)\./, line)
+      floors[i] = raw_items.split(/, |, and | and /g).map(raw_item => {
+        let match = RS(/an? (\w+)-compatible \w+/, raw_item)
         if (match) {
           const [_, type] = match
-          I.push(object(I.length, true, type))
+          I.push(item(I.length, true, type))
           return I.length - 1
         } else {
-          const [_, type] = RS(/an? (\w+) generator/, item)
-          I.push(object(I.length, false, type))
+          const [_, type] = RS(/an? (\w+) generator/, raw_item)
+          I.push(item(I.length, false, type))
           return I.length - 1
         }
       })
@@ -43,7 +42,7 @@ if (!globalThis.window) globalThis.window = globalThis
           const pairs = chips.filter(x => gens.some(g => g.type === x.type)).map(x => x.type)
           const un_chips = chips.filter(x => !pairs.some(t => t === x.type))
           const un_gens = gens.filter(x => !pairs.some(t => t === x.type))
-          key += 'P'.repeat(pairs.length) + un_chips.map(x => x.i).sort().join('') + un_gens.map(x => x.i).sort().join('') + ','
+          key += 'P'.repeat(pairs.length) + un_chips.map(x => 'U').join('') + un_gens.map(x => 'G').join('') + ','
         })
         return key + state.elevator
       }
@@ -53,7 +52,6 @@ if (!globalThis.window) globalThis.window = globalThis
         const k = to_key(curr)
         if (explored.has(k)) continue
         explored.add(k)
-        // L(curr)
         if (curr.floors[3].length === goal_count) {
           out(curr.moves)
           break
@@ -67,6 +65,7 @@ if (!globalThis.window) globalThis.window = globalThis
         const gens = items.filter(x => !x.chip)
         const un_chips = chips.filter(x => !gens.some(g => g.type === x.type))
         if (gens.length && un_chips.length) {
+          // fried chip
           continue
         }
 
@@ -95,17 +94,19 @@ if (!globalThis.window) globalThis.window = globalThis
         }
       }
     }
-    if (0) {
-      L(floors)
+    if (1) {
       run(p1)      
     }
     if (2) {
-      I.push(object(I.length, true, 'elerium'))
-      I.push(object(I.length, false, 'elerium'))
-      I.push(object(I.length, true, 'dilithium'))
-      I.push(object(I.length, false, 'dilithium'))
-      floors[0].push(I.length - 4, I.length - 3, I.length - 2, I.length - 1)
-      L(floors)
+      ;[
+        ['elerium', true],
+        ['elerium', false],
+        ['dilithium', true],
+        ['dilithium', false],
+      ].map(([type, chip]) => {
+        I.push(item(I.length, chip, type))
+        floors[0].push(I.length - 1)
+      })
       run(p2)
     }
   })
