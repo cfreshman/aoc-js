@@ -1,18 +1,41 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
+  // optimized
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    if (1) {
-      let rs = ll.map(line => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+    const grid = ll.grid()
+    const start = grid.gvof(c => c === '^')
+    let pos = start, dir = ve(0, -1)
+    const visited = set()
+    const blocks = {}
+    while (true) {
+      visited.add(pos.key)
+      const next = pos.add(dir), c = grid.gget(next)
+      if (!c) break
+      if (c === '#') dir = dir.right
+      else {
+        if (c === '.') blocks[next.key] = next
+        pos = next
+      }
     }
-    if (2) {
-
-      p2()
-    }
+    p1(visited.n)
+    const looped = set()
+    values(blocks).map(block => {
+      grid.gset(block, '#')
+      let pos = start, dir = ve(0, -1)
+      const states = set()
+      while (true) {
+        if (states.had([pos.key, dir.key].key)) {
+          looped.add(block.key)
+          break
+        }
+        const next = pos.add(dir), c = grid.gget(next)
+        if (!c) break
+        if (c === '#') dir = dir.right
+        else pos = next
+      }
+      grid.gset(block, '.')
+    })
+    p2(looped.n)
   })
 
   const l = console.log, L = l

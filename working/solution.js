@@ -140,6 +140,8 @@ if (!globalThis.window) globalThis.window = globalThis
     get angle() { return Math.atan2(this.y, this.x) }
     get unit() { return this.div(vec.of(this.length, this.length)) }
     get neg() { return vec.of(-this.x, -this.y) }
+    get right() { return vec.of(-this.y, this.x) }
+    get left() { return vec.of(this.y, -this.x) }
     get clone() { return vec.of(this.x, this.y) }
     get key() { return this.x + ',' + this.y }
 
@@ -188,7 +190,51 @@ if (!globalThis.window) globalThis.window = globalThis
     m: { value(f) { return this.map(f) } },
     s: { value(...xs) { return this.slice(...xs) } },
     f: { value(f) { return this.filter(f) } },
-    fs: { value(...fs) { return this.map((x, i) => fs[i] ? fs[i](x) : x) } }
+    fs: { value(...fs) { return this.map((x, i) => fs[i] ? fs[i](x) : x) } },
+    take: { value(f, eval=y=>y) {
+      let first = undefined
+      this.some((...args) => {
+        const y = f(...args)
+        if (eval(y)) first = y
+      })
+      return first
+    } },
+    takedefined: { value(f) { return this.take(f, y => y !== undefined) } },
+
+    get: { value(i) { return this[i] } },
+    set: { value(i, x) { this[i] = x } },
+    
+    grid: { value(outofbounds=undefined) {
+      this.outofbounds = outofbounds
+      for (let i = 0; i < this.n; i++) {
+        if (!Array.isArray(this[i])) this[i] = this[i].ar
+      }
+      return this
+    } },
+    gnrows: { get() { return this.n } },
+    gncols: { get() { return this[0].n } },
+    grows: { get() { return this } },
+    gcols: { get() { return this[0].map((_, i) => this.map(row => row[i])) } },
+    ginside: { value(v) { return this[v.y] && v.x >= 0 && v.x < this[0].n } },
+    gget: { value(v) { return this.ginside(v) ? this[v.y][v.x] : this.outofbounds } },
+    gset: { value(v, c) { if (this.ginside(v)) this[v.y][v.x] = c } },
+    gfor: { value(f) { this.forEach((line, y) => line.forEach((c, x) => f(c, x, y, this))) } },
+    gmap: { value(f) { return this.map((line, y) => line.map((c, x) => f(c, x, y, this))).grid(this.outofbounds) } },
+    gtake: { value(f, eval=undefined) { return this.take((line, y) => line.take((c, x) => f(c, x, y, this), eval), x => x !== undefined) } },
+    gvfor: { value(f) { this.gfor((c, x, y) => f(c, ve(x, y))) } },
+    gvmap: { value(f) { return this.gmap((c, x, y) => f(c, ve(x, y))) } },
+    gvtake: { value(f, eval=undefined) { return this.gtake((c, x, y) => f(c, ve(x, y)), eval) } },
+    gvof: { value(f) { return this.gvtake((c, v) => f(c, v) && v, x => !!x) } },
+    gvsof: { value(f) {
+      const vs = []
+      this.gvfor((c, v) => f(c, v) && vs.push(v))
+      return vs
+    } },
+    gsub: { value(v, s, new_outofbounds=this.outofbounds) { return this.slice(v.y, v.y + s.y).map(line => line.slice(v.x, v.x + s.x)).grid(new_outofbounds) } },
+    gadj: { value(v, d4=true) { return (d4 ? ve._d4 : ve._d8).map(([dx, dy]) => v.add(ve(dx, dy))).filter(v => this.ginside(v) || this.outofbounds) } },
+    gd4: { value(v) { return this.gadj(v, true) } },
+    gd8: { value(v) { return this.gadj(v, false) } },
+    gclone: { value() { return this.map(line => line.clone).grid(this.outofbounds) } },
   })
   Array.d4 = () => [
     [1, 0],
