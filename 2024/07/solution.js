@@ -1,18 +1,24 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    if (1) {
+    let run = (ops, answer) => {
+      let opstr = keys(ops).str
       let rs = ll.map(line => {
-
+        let [y, xs] = line.split(': ').fs(x => x.num, x => list(x).num)
+        let variations = opstr.vary(xs.length - 1)
+        let valid = variations.find(s => y === s.ar.obmap(ops).reduce((acc, f, i) => f(acc, xs[i + 1]), xs[0]))
+        return valid ? y : 0
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      answer(rs.sum)
     }
-    if (2) {
-
-      p2()
+    let p1_ops = {
+      '+': (a, b) => a + b,
+      '*': (a, b) => a * b,
     }
+    run(p1_ops, p1)
+    run(p1_ops.concat({
+      '|': (a, b) => (a.str + b.str).num,
+    }), p2)
   })
 
   const l = console.log, L = l

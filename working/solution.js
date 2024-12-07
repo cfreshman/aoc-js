@@ -200,6 +200,7 @@ if (!globalThis.window) globalThis.window = globalThis
       return first
     } },
     takedefined: { value(f) { return this.take(f, y => y !== undefined) } },
+    obmap: { value(ob) { return this.map(x => ob[x]) } },
 
     get: { value(i) { return this[i] } },
     set: { value(i, x) { this[i] = x } },
@@ -235,6 +236,43 @@ if (!globalThis.window) globalThis.window = globalThis
     gd4: { value(v) { return this.gadj(v, true) } },
     gd8: { value(v) { return this.gadj(v, false) } },
     gclone: { value() { return this.map(line => line.clone).grid(this.outofbounds) } },
+
+    vary: { value(n) {
+      const result = []
+      const recurse = (prefix) => {
+        if (prefix.n === n) return result.push(prefix)
+        for (let i = 0; i < this.n; i++) {
+          recurse(prefix.clone.concat(this[i]))
+        }
+      }
+      recurse([])
+      return result
+    } },
+    permute: { value(n) {
+      const result = []
+      const recurse = (prefix, used) => {
+        if (prefix.n === n) return result.push(prefix)
+        for (let i = 0; i < this.n; i++) {
+          if (used.has(i)) continue
+          used.add(i)
+          recurse(prefix.clone.concat(this[i]), used)
+          used.delete(i)
+        }
+      }
+      recurse([], new Set())
+      return result
+    } },
+    combine: { value(n) {
+      const result = []
+      const recurse = (prefix, start) => {
+        if (prefix.n === n) return result.push(prefix)
+        for (let i = start; i < this.n; i++) {
+          recurse(prefix.clone.concat(this[i]), i + 1)
+        }
+      }
+      recurse([], 0)
+      return result
+    } },
   })
   Array.d4 = () => [
     [1, 0],
@@ -267,12 +305,62 @@ if (!globalThis.window) globalThis.window = globalThis
       const result = U.rs(re, this)
       const apply = (match) => Array.from(match).slice(1).map((x, i) => fs[i](x))
       return re.global ? result.map(apply) : apply(result)
-    } }
+    } },
+
+    vary: { value(n) {
+      if (!this._memo_vary) this._memo_vary = {}
+      if (this._memo_vary[n]) return this._memo_vary[n].clone
+
+      const result = set()
+      const recurse = (prefix) => {
+        if (prefix.length === n) return result.add(prefix)
+        for (let i = 0; i < this.n; i++) {
+          recurse(prefix + this[i])
+        }
+      }
+      recurse('')
+
+      return (this._memo_vary[n] = result.ar).clone
+    } },
+    permute: { value(n) {
+      if (!this._memo_permute) this._memo_permute = {}
+      if (this._memo_permute[n]) return this._memo_permute[n].clone
+
+      const result = set(), used = set()
+      const recurse = (prefix) => {
+        if (prefix.length === n) return result.add(prefix)
+        for (let i = 0; i < this.n; i++) {
+          if (used.has(this[i])) continue
+          used.add(this[i])
+          recurse(prefix + this[i])
+          used.delete(this[i])
+        }
+      }
+      recurse('')
+
+      return (this._memo_permute[n] = result.ar).clone
+    } },
+    combine: { value(n) {
+      if (!this._memo_combine) this._memo_combine = {}
+      if (this._memo_combine[n]) return this._memo_combine[n].clone
+
+      const result = set()
+      const recurse = (prefix, start) => {
+        if (prefix.length === n) return result.add(prefix)
+        for (let i = start; i < this.n; i++) {
+          recurse(prefix + this[i], i + 1)
+        }
+      }
+      recurse('', 0)
+
+      return (this._memo_combine[n] = result.ar).clone
+    } },
   })
 
   Object.defineProperties(Number.prototype, {
     repeat: { value(n) { return An(n).fill(this) } },
     bin: { get() { return this.toString(2) } },
+    str: { get() { return String(this) } },
   })
 
   Object.defineProperties(Set.prototype, {
@@ -298,6 +386,7 @@ if (!globalThis.window) globalThis.window = globalThis
     m: { value(f) { return U.omap(this, f) } },
     key: { get() { return this.e.map(e => e.join(':')).join(',') } },
     eq: { value(ob) { return this.k.length === ob.k.length && this.k.every(k => this[k] === ob[k]) } },
+    concat: { value(ob) { return { ...this, ...ob } } },
   })
 
   

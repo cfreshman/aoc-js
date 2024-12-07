@@ -2,16 +2,64 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
+      const operators = [
+        { op: '+', func: (a, b) => a + b },
+        { op: '*', func: (a, b) => a * b },
+      ]
+      const key2op = {
+        '+': operators[0],
+        '*': operators[1],
+      }
+      const memo = {}
+      const oplist = (n) => {
+        if (memo[n]) return memo[n]
+        const recurse = (prefix) => {
+          if (prefix.length === n) return [prefix]
+          return operators.flatMap(({ op }) => recurse(prefix + op))
+        }
+        return memo[n] = recurse('')
+      }
       let rs = ll.map(line => {
-
+        let [result, args] = line.split(': ')
+        result = result.num
+        args = args.split(' ').num
+        let opss = oplist(args.length - 1)
+        let ops = opss.find(opstr => opstr.split('').map(c => key2op[c]).reduce((acc, { func }, i) => func(acc, args[i + 1]), args[0]) === result)
+        L(result, args, ops)
+        return ops ? result : 0
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      p1(rs.sum)
     }
     if (2) {
-
-      p2()
+      const operators = [
+        { op: '+', func: (a, b) => a + b },
+        { op: '*', func: (a, b) => a * b },
+        { op: '|', func: (a, b) => Number(String(a) + String(b)) },
+      ]
+      const key2op = {
+        '+': operators[0],
+        '*': operators[1],
+        '|': operators[2],
+      }
+      const memo = {}
+      const oplist = (n) => {
+        if (memo[n]) return memo[n]
+        const recurse = (prefix) => {
+          if (prefix.length === n) return [prefix]
+          return operators.flatMap(({ op }) => recurse(prefix + op))
+        }
+        return memo[n] = recurse('')
+      }
+      let rs = ll.map(line => {
+        let [result, args] = line.split(': ')
+        result = result.num
+        args = args.split(' ').num
+        let opss = oplist(args.length - 1)
+        let ops = opss.find(opstr => opstr.split('').map(c => key2op[c]).reduce((acc, { func }, i) => func(acc, args[i + 1]), args[0]) === result)
+        L(result, args, ops)
+        return ops ? result : 0
+      })
+      p1(rs.sum)
     }
   })
 
@@ -200,7 +248,6 @@ if (!globalThis.window) globalThis.window = globalThis
       return first
     } },
     takedefined: { value(f) { return this.take(f, y => y !== undefined) } },
-    obmap: { value(ob) { return this.map(x => ob[x]) } },
 
     get: { value(i) { return this[i] } },
     set: { value(i, x) { this[i] = x } },
@@ -236,43 +283,6 @@ if (!globalThis.window) globalThis.window = globalThis
     gd4: { value(v) { return this.gadj(v, true) } },
     gd8: { value(v) { return this.gadj(v, false) } },
     gclone: { value() { return this.map(line => line.clone).grid(this.outofbounds) } },
-
-    vary: { value(n) {
-      const result = []
-      const recurse = (prefix) => {
-        if (prefix.n === n) return result.push(prefix)
-        for (let i = 0; i < this.n; i++) {
-          recurse(prefix.clone.concat(this[i]))
-        }
-      }
-      recurse([])
-      return result
-    } },
-    permute: { value(n) {
-      const result = []
-      const recurse = (prefix, used) => {
-        if (prefix.n === n) return result.push(prefix)
-        for (let i = 0; i < this.n; i++) {
-          if (used.has(i)) continue
-          used.add(i)
-          recurse(prefix.clone.concat(this[i]), used)
-          used.delete(i)
-        }
-      }
-      recurse([], new Set())
-      return result
-    } },
-    combine: { value(n) {
-      const result = []
-      const recurse = (prefix, start) => {
-        if (prefix.n === n) return result.push(prefix)
-        for (let i = start; i < this.n; i++) {
-          recurse(prefix.clone.concat(this[i]), i + 1)
-        }
-      }
-      recurse([], 0)
-      return result
-    } },
   })
   Array.d4 = () => [
     [1, 0],
@@ -308,9 +318,6 @@ if (!globalThis.window) globalThis.window = globalThis
     } },
 
     vary: { value(n) {
-      if (!this._memo_vary) this._memo_vary = {}
-      if (this._memo_vary[n]) return this._memo_vary[n].clone
-
       const result = set()
       const recurse = (prefix) => {
         if (prefix.length === n) return result.add(prefix)
@@ -319,13 +326,9 @@ if (!globalThis.window) globalThis.window = globalThis
         }
       }
       recurse('')
-
-      return (this._memo_vary[n] = result.ar).clone
+      return result.ar
     } },
     permute: { value(n) {
-      if (!this._memo_permute) this._memo_permute = {}
-      if (this._memo_permute[n]) return this._memo_permute[n].clone
-
       const result = set(), used = set()
       const recurse = (prefix) => {
         if (prefix.length === n) return result.add(prefix)
@@ -337,13 +340,9 @@ if (!globalThis.window) globalThis.window = globalThis
         }
       }
       recurse('')
-
-      return (this._memo_permute[n] = result.ar).clone
+      return result.ar
     } },
     combine: { value(n) {
-      if (!this._memo_combine) this._memo_combine = {}
-      if (this._memo_combine[n]) return this._memo_combine[n].clone
-
       const result = set()
       const recurse = (prefix, start) => {
         if (prefix.length === n) return result.add(prefix)
@@ -352,15 +351,13 @@ if (!globalThis.window) globalThis.window = globalThis
         }
       }
       recurse('', 0)
-
-      return (this._memo_combine[n] = result.ar).clone
+      return result.ar
     } },
   })
 
   Object.defineProperties(Number.prototype, {
     repeat: { value(n) { return An(n).fill(this) } },
     bin: { get() { return this.toString(2) } },
-    str: { get() { return String(this) } },
   })
 
   Object.defineProperties(Set.prototype, {
@@ -386,7 +383,6 @@ if (!globalThis.window) globalThis.window = globalThis
     m: { value(f) { return U.omap(this, f) } },
     key: { get() { return this.e.map(e => e.join(':')).join(',') } },
     eq: { value(ob) { return this.k.length === ob.k.length && this.k.every(k => this[k] === ob[k]) } },
-    concat: { value(ob) { return { ...this, ...ob } } },
   })
 
   
