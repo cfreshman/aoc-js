@@ -1,17 +1,39 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    let grid = ll.grid()
+    let N = {}
+    grid.gvfor((c, v) => {
+      if (c !== '.') {
+        if (!N[c]) N[c] = []
+        N[c].push(v)
+      }
+    })
     if (1) {
-      let rs = ll.map(ln => {
-
+      let unique = set()
+      values(N).map(vs => {
+        let pairs = vs.permute(2)
+        pairs.map(([a, b]) => {
+          let c = b.add(b.sub(a))
+          if (grid.ginside(c)) unique.add(c.key)
+        })
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      p1(unique.n)
     }
     if (2) {
-
-      p2()
+      let unique = set()
+      values(N).map(vs => {
+        let pairs = vs.permute(2)
+        pairs.map(([a, b]) => {
+          let off = b.sub(a)
+          let c = b
+          while (grid.ginside(c)) {
+            unique.add(c.key)
+            c = c.add(off)
+          }
+        })
+      })
+      p2(unique.n)
     }
   })
 
@@ -29,7 +51,7 @@ if (!globalThis.window) globalThis.window = globalThis
     an: (n, f=x=>x) => Array.from({ length: n }).map(f),
     stringish: (o) => typeof o === 'string' || o instanceof String,
     n: (o) => U.stringish(o) ? Number(o) : U.a(o).map(Number),
-    list: (str, sep) => U.stringish(str) ? str.split(sep || ' ') : Array.from(str),
+    list: (str, sep) => U.stringish(o) ? str.split(sep || ' ') : Array.from(str),
     set: (str, sep) => new Set(U.list(str, sep)),
     merge: obs => Object.assign({}, ...obs),
     omap: (ob, func) => Object.entries(ob).map(entry => func(...entry)),
@@ -167,8 +189,6 @@ if (!globalThis.window) globalThis.window = globalThis
       Object.defineProperties(pqp, {
         n: { get() { return this.size() } },
         empty: { get() { return this.isEmpty() } },
-      
-        peek: { value() { return this.front() } },
       })
     })
     
@@ -199,6 +219,7 @@ if (!globalThis.window) globalThis.window = globalThis
     s: { value(...xs) { return this.slice(...xs) } },
     f: { value(f) { return this.filter(f) } },
     fs: { value(...fs) { return this.map((x, i) => fs[i] ? fs[i](x) : x) } },
+    for: { value(f) { this.forEach(f) } },
     take: { value(f, eval=y=>y) {
       let first = undefined
       this.some((...args) => {
@@ -305,7 +326,6 @@ if (!globalThis.window) globalThis.window = globalThis
     list: { get() { return U.list(this) } },
     set: { get() { return U.set(this) } },
     a: { get() { return U.a(this) } }, ar: { get() { return this.a } },
-    twoline: { get() { return this.split('\n\n').map(group => group.split('\n')) } },
     
     i: { value(i) { return U.i(this, i) } },
     is: { value(i, c) { return this.i(i) === c } },
@@ -369,7 +389,7 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Number.prototype, {
-    repeat: { value(n) { return An(n).fill(Number(this)) } },
+    repeat: { value(n) { return An(n).fill(this) } },
     bin: { get() { return this.toString(2) } },
     str: { get() { return String(this) } },
   })
@@ -396,10 +416,10 @@ if (!globalThis.window) globalThis.window = globalThis
     keys: { get() { return K(this) } },
     values: { get() { return V(this) } },
     entries: { get() { return E(this) } },
-    key: { get() { return this.entries.map(e => e.join(':')).join(',') } },
+    key: { get() { return this.e.map(e => e.join(':')).join(',') } },
     
     omap: { value(f) { return U.omap(this, f) } },
-    eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
+    eq: { value(ob) { return this.k.length === ob.k.length && this.k.every(k => this[k] === ob[k]) } },
     concat: { value(ob) { return { ...this, ...ob } } },
   })
 

@@ -1,17 +1,43 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    const checksum = (ar) => {
+      let sum = 0
+      for (let i = 0; i < ar.length; i++) {
+        if (ar[i] < 0) continue
+        sum += ar[i] * i
+      }
+      return sum
+    }
+    const xs = ii.ar.num
     if (1) {
-      let rs = ll.map(ln => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      let i_file = 0
+      let ar = xs.map((x, i) => (i % 2 === 0 ? i_file++ : -1).repeat(x)).flat()
+      L(ar)
+      let empty = 0, move = ar.length - 1
+      while (1) {
+        while (ar[empty] !== -1) empty++
+        while (ar[move] === -1) move--
+        if (move <= empty) break
+        ar[empty] = ar[move]
+        ar[move] = -1
+      }
+      p1(checksum(ar))
     }
     if (2) {
-
-      p2()
+      let i_file = 0
+      let ar = xs.map((x, i) => (i % 2 === 0 ? i_file++ : -1).repeat(x))
+      for (let move = i_file - 1; move > 0; move--) {
+        let block = ar.findIndex(row => row.includes(move))
+        const ar_block = ar[block]
+        let empty = ar.findIndex(row => row[0] === -1 && row.length >= ar_block.length)
+        if (empty > -1 && empty < block) {
+          let diff = ar[empty].length - ar_block.length
+          ar.splice(empty, 1, ar_block, range(diff).map(i => -1))
+          ar.splice(block + 1, 1, range(ar_block.length).map(i => -1))
+        }
+      }
+      p2(checksum(ar.flat()))
     }
   })
 

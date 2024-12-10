@@ -1,17 +1,13 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    let packs = ii.twoline.map(pack => pack.num.sum)
     if (1) {
-      let rs = ll.map(ln => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      p1(packs.max)
     }
     if (2) {
-
-      p2()
+      let top = packs.numsort.slice(-3)
+      p2(top.sum)
     }
   })
 
@@ -29,7 +25,7 @@ if (!globalThis.window) globalThis.window = globalThis
     an: (n, f=x=>x) => Array.from({ length: n }).map(f),
     stringish: (o) => typeof o === 'string' || o instanceof String,
     n: (o) => U.stringish(o) ? Number(o) : U.a(o).map(Number),
-    list: (str, sep) => U.stringish(str) ? str.split(sep || ' ') : Array.from(str),
+    list: (str, sep) => U.stringish(o) ? str.split(sep || ' ') : Array.from(str),
     set: (str, sep) => new Set(U.list(str, sep)),
     merge: obs => Object.assign({}, ...obs),
     omap: (ob, func) => Object.entries(ob).map(entry => func(...entry)),
@@ -369,7 +365,7 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Number.prototype, {
-    repeat: { value(n) { return An(n).fill(Number(this)) } },
+    repeat: { value(n) { return An(n).fill(this) } },
     bin: { get() { return this.toString(2) } },
     str: { get() { return String(this) } },
   })

@@ -1,17 +1,34 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    let move = {
+      A: 'R', B: 'P', C: 'S',
+      X: 'R', Y: 'P', Z: 'S',
+    }
     if (1) {
-      let rs = ll.map(ln => {
-
+      let score = 0
+      ll.map(line => {
+        let [op, me] = line.list.map(x => move[x])
+        score += ' RPS'.indexOf(me)
+        if (op === me) score += 3
+        if ('RPS'.indexOf(me) === (1 + 'RPS'.indexOf(op)) % 3) score += 6
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      p1(score)
     }
     if (2) {
-
-      p2()
+      let score = 0
+      ll.map(line => {
+        let [op, me] = line.list.fs(x => move[x])
+        let diff = 0
+        if (me === 'X') diff = -1
+        else if (me === 'Z') diff = 1
+        me = 'RPS'[('RPS'.indexOf(op) + 3 + diff) % 3]
+        
+        score += ' RPS'.indexOf(me)
+        if (op === me) score += 3
+        if ('RPS'.indexOf(me) === (1 + 'RPS'.indexOf(op)) % 3) score += 6
+      })
+      p2(score)
     }
   })
 
@@ -369,7 +386,7 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Number.prototype, {
-    repeat: { value(n) { return An(n).fill(Number(this)) } },
+    repeat: { value(n) { return An(n).fill(this) } },
     bin: { get() { return this.toString(2) } },
     str: { get() { return String(this) } },
   })

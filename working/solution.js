@@ -2,8 +2,8 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
-      let rs = ll.map(line => {
-
+      let rs = ll.map(ln => {
+        
       })
       p1()
       // p1(sum(rs))
@@ -29,7 +29,7 @@ if (!globalThis.window) globalThis.window = globalThis
     an: (n, f=x=>x) => Array.from({ length: n }).map(f),
     stringish: (o) => typeof o === 'string' || o instanceof String,
     n: (o) => U.stringish(o) ? Number(o) : U.a(o).map(Number),
-    list: (str, sep) => U.stringish(o) ? str.split(sep || ' ') : Array.from(str),
+    list: (str, sep) => U.stringish(str) ? str.split(sep || ' ') : Array.from(str),
     set: (str, sep) => new Set(U.list(str, sep)),
     merge: obs => Object.assign({}, ...obs),
     omap: (ob, func) => Object.entries(ob).map(entry => func(...entry)),
@@ -116,6 +116,9 @@ if (!globalThis.window) globalThis.window = globalThis
       this.x = x
       this.y = y
     }
+    get 0() { return this.x } set 0(x) { this.x = x }
+    get 1() { return this.y } set 1(y) { this.y = y }
+
     static of = (x, y) => new vec(x, y)
     static from = (ob) => new vec(ob.x, ob.y)
 
@@ -135,15 +138,16 @@ if (!globalThis.window) globalThis.window = globalThis
     scale(s) { return vec.of(this.x * s, this.y * s) }
     dot(v) { return this.x * v.x + this.y * v.y }
     cross(v) { return this.x * v.y - this.y * v.x }
-    proj(v) { return this.dot(v) / v.length }
-    get length() { return Math.hypot(this.x, this.y) }
+    proj(v) { return v.scale(this.dot(v) / v.dot(v)) }
+    get length() { return Math.hypot(this.x, this.y) } get n() { return this.length }
     get angle() { return Math.atan2(this.y, this.x) }
-    get unit() { return this.div(vec.of(this.length, this.length)) }
+    get unit() { return this.div(vec.of(this.length, this.length)) } get norm() { return this.unit }
     get neg() { return vec.of(-this.x, -this.y) }
     get right() { return vec.of(-this.y, this.x) }
     get left() { return vec.of(this.y, -this.x) }
     get clone() { return vec.of(this.x, this.y) }
     get key() { return this.x + ',' + this.y }
+    get ar() { return [this.x, this.y] }
 
     static _d4 = [[1, 0], [0, 1], [-1, 0], [0, -1]]
     static _d8 = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]]
@@ -152,20 +156,24 @@ if (!globalThis.window) globalThis.window = globalThis
   }
   const ve = vec.of
 
-  // https://github.com/datastructures-js/priority-queue
-  const {
-    PriorityQueue: PQ,
-    MinPriorityQueue: PQN,
-    MaxPriorityQueue: PQX,
-  } = require('@datastructures-js/priority-queue')
-  ;[PQ.prototype, PQN.prototype, PQX.prototype].map(pqp => {
-    Object.defineProperties(pqp, {
-      n: { get() { return this.size() } },
-      empty: { get() { return this.isEmpty() } },
+  if (window.require) {
+    // https://github.com/datastructures-js/priority-queue
+    const {
+      PriorityQueue: PQ,
+      MinPriorityQueue: PQN,
+      MaxPriorityQueue: PQX,
+    } = require('@datastructures-js/priority-queue')
+    ;[PQ.prototype, PQN.prototype, PQX.prototype].map(pqp => {
+      Object.defineProperties(pqp, {
+        n: { get() { return this.size() } },
+        empty: { get() { return this.isEmpty() } },
+      
+        peek: { value() { return this.front() } },
+      })
     })
-  })
-  
-  const crypto = require('crypto')
+    
+    window.crypto = require('crypto')
+  }
   U.md5 = (str) => crypto.createHash('md5').update(str).digest('hex')
 
   Object.defineProperties(Array.prototype, {
@@ -208,7 +216,7 @@ if (!globalThis.window) globalThis.window = globalThis
     grid: { value(outofbounds=undefined) {
       this.outofbounds = outofbounds
       for (let i = 0; i < this.n; i++) {
-        if (!Array.isArray(this[i])) this[i] = this[i].ar
+        if (!Array.isArray(this[i])) this[i] = Array.from(this[i])
       }
       return this
     } },
@@ -242,7 +250,7 @@ if (!globalThis.window) globalThis.window = globalThis
       const recurse = (prefix) => {
         if (prefix.n === n) return result.push(prefix)
         for (let i = 0; i < this.n; i++) {
-          recurse(prefix.clone.concat(this[i]))
+          recurse(prefix.clone.concat([this[i]]))
         }
       }
       recurse([])
@@ -255,7 +263,7 @@ if (!globalThis.window) globalThis.window = globalThis
         for (let i = 0; i < this.n; i++) {
           if (used.has(i)) continue
           used.add(i)
-          recurse(prefix.clone.concat(this[i]), used)
+          recurse(prefix.clone.concat([this[i]]), used)
           used.delete(i)
         }
       }
@@ -267,7 +275,7 @@ if (!globalThis.window) globalThis.window = globalThis
       const recurse = (prefix, start) => {
         if (prefix.n === n) return result.push(prefix)
         for (let i = start; i < this.n; i++) {
-          recurse(prefix.clone.concat(this[i]), i + 1)
+          recurse(prefix.clone.concat([this[i]]), i + 1)
         }
       }
       recurse([], 0)
@@ -294,8 +302,11 @@ if (!globalThis.window) globalThis.window = globalThis
   Object.defineProperties(String.prototype, {
     n: { get() { return this.length } },
     num: { get() { return U.n(this) } },
+    list: { get() { return U.list(this) } },
+    set: { get() { return U.set(this) } },
     a: { get() { return U.a(this) } }, ar: { get() { return this.a } },
-
+    twoline: { get() { return this.split('\n\n').map(group => group.split('\n')) } },
+    
     i: { value(i) { return U.i(this, i) } },
     is: { value(i, c) { return this.i(i) === c } },
     s: { value(...xs) { return this.slice(...xs) } },
@@ -358,7 +369,7 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Number.prototype, {
-    repeat: { value(n) { return An(n).fill(this) } },
+    repeat: { value(n) { return An(n).fill(Number(this)) } },
     bin: { get() { return this.toString(2) } },
     str: { get() { return String(this) } },
   })
@@ -366,6 +377,8 @@ if (!globalThis.window) globalThis.window = globalThis
   Object.defineProperties(Set.prototype, {
     n: { get() { return this.size } },
     a: { get() { return Array.from(this) } }, ar: { get() { return this.a } },
+    str: { get() { return Array.from(this).join('') } },
+    
     had: { value(x) {
       const had = this.has(x)
       this.add(x)
@@ -380,12 +393,13 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Object.prototype, {
-    k: { get() { return K(this) } },
-    v: { get() { return V(this) } },
-    e: { get() { return E(this) } },
-    m: { value(f) { return U.omap(this, f) } },
-    key: { get() { return this.e.map(e => e.join(':')).join(',') } },
-    eq: { value(ob) { return this.k.length === ob.k.length && this.k.every(k => this[k] === ob[k]) } },
+    keys: { get() { return K(this) } },
+    values: { get() { return V(this) } },
+    entries: { get() { return E(this) } },
+    key: { get() { return this.entries.map(e => e.join(':')).join(',') } },
+    
+    omap: { value(f) { return U.omap(this, f) } },
+    eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
     concat: { value(ob) { return { ...this, ...ob } } },
   })
 
