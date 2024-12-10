@@ -36,17 +36,18 @@ const main = async () => {
     child_process.execSync(`rm working/scratch.txt && touch working/scratch.txt`)
     child_process.execSync(`rm working/input.txt && touch working/input.txt`)
   } else if (command === 'fetch') {
-    // wait until next midnight
-    const now = new Date()
-    const midnight = new Date(now)
-    midnight.setHours(24, 0, 0, 0)
-    const delay = midnight - now
-    console.log(`waiting ${delay}ms`)
-    await new Promise(resolve => setTimeout(resolve, delay))
-
-    let year = 2024, day = 9
+    let year = 2024, day = 11
     if (args[0]) {
       ;[year, day] = args[0].split('/').map(Number)
+    }
+    // wait until next midnight
+    {
+      const now = new Date()
+      const midnight = new Date(now)
+      midnight.setHours(24, 0, 0, 0)
+      const delay = midnight - now
+      console.log(`waiting ${delay}ms`)
+      await new Promise(resolve => setTimeout(resolve, delay))
     }
     const url = `https://adventofcode.com/${year}/day/${day}/input`
     const COOKIE = 'session=53616c7465645f5fceb73faf30c6f8caa69d3001a0408ad28b9d6bb377cefd4fefcebc6ff4a43939433398bb0980702bb8b869e8c51a5e7e6939a72cc5e1d94f'

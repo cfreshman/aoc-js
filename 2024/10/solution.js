@@ -1,17 +1,24 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    let grid = ll.grid().gmap(x => x.num)
+    let starts = grid.gvsof(c => c === 0)
+    const recurse = (v, out=[]) => {
+      const x = grid.gget(v)
+      if (x === 9) return out.push(v)
+      for (const u of grid.gd4(v)) {
+        if (x + 1 === grid.gget(u)) recurse(u, out)
+      }
+      return out
+    }
+    const trailheads = starts.map(start => recurse(start))
     if (1) {
-      let rs = ll.map(ln => {
-
-      })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      const scores = trailheads.map(th => set(th.map(nine => nine.key)).n)
+      p1(scores.sum)
     }
     if (2) {
-
-      p2()
+      const scores = trailheads.map(th => th.n)
+      p2(scores.sum)
     }
   })
 

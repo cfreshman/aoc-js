@@ -3,7 +3,7 @@ if (!globalThis.window) globalThis.window = globalThis
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
       let rs = ll.map(ln => {
-        
+
       })
       p1()
       // p1(sum(rs))
@@ -199,6 +199,11 @@ if (!globalThis.window) globalThis.window = globalThis
     s: { value(...xs) { return this.slice(...xs) } },
     f: { value(f) { return this.filter(f) } },
     fs: { value(...fs) { return this.map((x, i) => fs[i] ? fs[i](x) : x) } },
+    group: { value(n) { return U.group(this, n) } },
+    count: { value() { return U.count(this) } },
+    diff: { value() { return U.diff(this) } },
+    maxxing: { value(f) { return max(this, f) } },
+    minning: { value(f) { return min(this, f) } },
     take: { value(f, eval=y=>y) {
       let first = undefined
       this.some((...args) => {
@@ -209,6 +214,7 @@ if (!globalThis.window) globalThis.window = globalThis
     } },
     takedefined: { value(f) { return this.take(f, y => y !== undefined) } },
     obmap: { value(ob) { return this.map(x => ob[x]) } },
+    kmap: { value(key) { return this.map(x => x[key]) } },
 
     get: { value(i) { return this[i] } },
     set: { value(i, x) { this[i] = x } },
@@ -240,7 +246,7 @@ if (!globalThis.window) globalThis.window = globalThis
       return vs
     } },
     gsub: { value(v, s, new_outofbounds=this.outofbounds) { return this.slice(v.y, v.y + s.y).map(line => line.slice(v.x, v.x + s.x)).grid(new_outofbounds) } },
-    gadj: { value(v, d4=true) { return (d4 ? ve._d4 : ve._d8).map(([dx, dy]) => v.add(ve(dx, dy))).filter(v => this.ginside(v) || this.outofbounds) } },
+    gadj: { value(v, d4=true) { return (d4 ? vec._d4 : vec._d8).map(([dx, dy]) => v.add(ve(dx, dy))).filter(v => this.ginside(v) || this.outofbounds) } },
     gd4: { value(v) { return this.gadj(v, true) } },
     gd8: { value(v) { return this.gadj(v, false) } },
     gclone: { value() { return this.map(line => line.clone).grid(this.outofbounds) } },
