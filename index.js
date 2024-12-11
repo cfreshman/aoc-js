@@ -1,5 +1,7 @@
+const process = require('process')
 const fs = require('fs')
 const child_process = require('child_process')
+require('dotenv').config()
 
 const main = async () => {
   const [command, ...args] = process.argv.slice(2)
@@ -41,7 +43,7 @@ const main = async () => {
       ;[year, day] = args[0].split('/').map(Number)
     }
     // wait until next midnight
-    {
+    if (1) {
       const now = new Date()
       const midnight = new Date(now)
       midnight.setHours(24, 0, 0, 0)
@@ -50,12 +52,12 @@ const main = async () => {
       await new Promise(resolve => setTimeout(resolve, delay))
     }
     const url = `https://adventofcode.com/${year}/day/${day}/input`
-    const COOKIE = 'session=53616c7465645f5fceb73faf30c6f8caa69d3001a0408ad28b9d6bb377cefd4fefcebc6ff4a43939433398bb0980702bb8b869e8c51a5e7e6939a72cc5e1d94f'
+    const COOKIE = `session=${process.env.AOC_SESSION}`
     const input = await fetch(url, {
       method: 'GET',
       headers: { 'Cookie': COOKIE },
     }).then(rs => rs.text())
-    fs.writeFileSync('working/input.txt', input)
+    fs.writeFileSync('working/input.txt', input.slice(0, -1))
   }
 }
 main()

@@ -1,18 +1,19 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    if (1) {
-      let rs = ll.map(ln => {
-
+    stones = ii.list.num
+    let run = (steps, answer) => {
+      const recurse = U.memoed((stone, n=steps) => {
+        if (n === 0) return 1
+        if (stone === 0) return recurse(1, n - 1)
+        let ss = stone.str, sl = ss.length
+        if (sl % 2 === 0) return recurse(ss.slice(0, sl / 2).num, n - 1) + recurse(ss.slice(sl / 2).num, n - 1)
+        return recurse(stone * 2024, n - 1)
       })
-      p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      answer(stones.map(x => recurse(x)).sum)
     }
-    if (2) {
-
-      p2()
-    }
+    if (1) run(25, p1)
+    if (2) run(75, p2)
   })
 
   const l = console.log, L = l

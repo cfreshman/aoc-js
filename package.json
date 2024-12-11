@@ -13,6 +13,7 @@
     "fetch": "node index.js fetch $@"
   },
   "dependencies": {
-    "@datastructures-js/priority-queue": "^6.3.1"
+    "@datastructures-js/priority-queue": "^6.3.1",
+    "dotenv": "^16.4.7"
   }
 }

@@ -90,6 +90,14 @@ if (!globalThis.window) globalThis.window = globalThis
       return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1])
     },
     array: (length, func = () => 0) => Array.from({ length }).map((_, i) => func(i)),
+    memoed: (func) => {
+      const memo = {}
+      return (...args) => {
+        let key = args.key
+        if (memo[key] !== undefined) return memo[key]
+        return memo[key] = func(...args)
+      }
+    },
     answer: (input, func) => U.use({}, answers => func(input.split('\n'), ...['1', '2'].map(pN => aN => { l(pN, aN); answers[pN] = aN; }))),
   }
   const keys = U.k, K = keys
