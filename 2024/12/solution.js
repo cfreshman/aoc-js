@@ -1,17 +1,90 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    grid = ll.grid(-1)
+    let ex = set()
+    let regions = []
+    grid.gvfor((c, v) => {
+      if (ex.has(v.key)) return
+      let fr = [v]
+      let region = []
+      while (fr.length) {
+        const curr = fr.pop()
+        if (ex.had(curr.key)) continue
+        region.push(curr)
+        grid.gd4(curr).map(v => {
+          if (grid.gget(v) === c) fr.push(v)
+        })
+      }
+      regions.push(region)
+    })
     if (1) {
-      let rs = ll.map(ln => {
-
+      let xs = regions.map(r => {
+        let area = r.n
+        let perimeter = 0
+        let r_set = r.map(v => v.key).set
+        r.map(v => grid.gd4(v).map(u => {
+          if (!r_set.has(u.key)) perimeter++
+        }))
+        return area * perimeter
       })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
+      p1(xs.sum)
     }
     if (2) {
+      let xs = regions.map(r => {
+        let c = grid.gget(r[0])
+        let outer = r.filter(v => grid.gd4(v).some(u => grid.gget(u) !== c))
+        
+        let lines = []
+        outer.map(v => {
+          let nw = v, ne = v.add(ve(1, 0)), se = v.add(ve(1, 1)), sw = v.add(ve(0, 1))
+          if (grid.gget(v.add(ve(0, -1))) !== c) lines.push([nw, 1, ne])
+          if (grid.gget(v.add(ve(1, 0))) !== c) lines.push([ne, 2, se])
+          if (grid.gget(v.add(ve(0, 1))) !== c) lines.push([se, 3, sw])
+          if (grid.gget(v.add(ve(-1, 0))) !== c) lines.push([sw, 4, nw])
+        })
+        let ob = {}
+        lines.map(line => ob[line.map(v => v.key).key] = line)
+        
+        let change = true
+        while (change) {
+          change = false
+          
+          let corners = {}
+          entries(ob).map(([id, line]) => {
+            ;[line[0], line[2]].map(v => {
+              if (corners[v.key]) corners[v.key].push(id)
+              else corners[v.key] = [id]
+            })
+          })
+          entries(corners).map(([key, ids]) => {
+            if (ids.length >= 2) {
+              const pairs = ids.combine(2)
+              for (let i = 0; i < pairs.length; i++) {
+                let [id1, id2] = pairs[i]
+                let l1 = ob[id1], l2 = ob[id2]
+                if (!l1 || !l2) continue
+                if (l1[1] !== l2[1]) continue
+                if (l1[0].key === key) l1.reverse()
+                if (l2[2].key === key) l2.reverse()
+                if (l2[2].sub(l1[0]).angle === l1[2].sub(l1[0]).angle) {
+                  let line = [l1[0], l1[1], l2[2]]
+                  ob[line.map(v => v.key).key] = line
+                  delete ob[id1]
+                  delete ob[id2]
+                  change = true
+                  return
+                }
+              }
+            }
+          })
+        }
 
-      p2()
+        let sides = values(ob).n
+        let area = r.n
+        return area * sides
+      })
+      p2(xs.sum)
     }
   })
 

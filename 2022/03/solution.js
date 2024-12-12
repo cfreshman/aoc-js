@@ -3,15 +3,23 @@ if (!globalThis.window) globalThis.window = globalThis
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     if (1) {
       let rs = ll.map(ln => {
-
+        let [front, back] = ln.group(ln.n/2)
+        let front_set = front.ar.set
+        let common = back.ar.find(x => front_set.has(x))
+        let score = common < 'a' ? common.ordupper + 27 : common.ordlower + 1
+        return score
       })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
+      p1(rs.sum)
     }
     if (2) {
-
-      p2()
+      let rs = ll.group(3).map(lns => {
+        let set_0 = lns[0].ar.set
+        let set_1 = lns[1].ar.set
+        let common = lns[2].ar.find(x => set_0.has(x) && set_1.has(x))
+        let score = common < 'a' ? common.ordupper + 27 : common.ordlower + 1
+        return score
+      })
+      p2(rs.sum)
     }
   })
 

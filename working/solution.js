@@ -6,8 +6,8 @@ if (!globalThis.window) globalThis.window = globalThis
 
       })
       p1()
-      // p1(sum(rs))
-      // p1(product(rs))
+      // p1(rs.sum)
+      // p1(rs.product)
     }
     if (2) {
 
@@ -224,8 +224,8 @@ if (!globalThis.window) globalThis.window = globalThis
     obmap: { value(ob) { return this.map(x => ob[x]) } },
     kmap: { value(key) { return this.map(x => x[key]) } },
 
-    get: { value(i) { return this[i] } },
-    set: { value(i, x) { this[i] = x } },
+    aget: { value(i) { return this[i] } },
+    aset: { value(i, x) { this[i] = x } },
     
     grid: { value(outofbounds=undefined) {
       this.outofbounds = outofbounds
@@ -320,6 +320,9 @@ if (!globalThis.window) globalThis.window = globalThis
     set: { get() { return U.set(this) } },
     a: { get() { return U.a(this) } }, ar: { get() { return this.a } },
     twoline: { get() { return this.split('\n\n').map(group => group.split('\n')) } },
+    ord: { get() { return this.charCodeAt(0) } },
+    ordlower: { get() { return this.ord - 'a'.ord } },
+    ordupper: { get() { return this.ord - 'A'.ord } },
     
     i: { value(i) { return U.i(this, i) } },
     is: { value(i, c) { return this.i(i) === c } },
@@ -331,7 +334,11 @@ if (!globalThis.window) globalThis.window = globalThis
       const apply = (match) => Array.from(match).slice(1).map((x, i) => fs[i](x))
       return re.global ? result.map(apply) : apply(result)
     } },
-
+    code: { value(i) { return this.charCodeAt(i) } },
+    codelower: { value(i) { return this.code(i) - 'a'.ord } },
+    codeupper: { value(i) { return this.code(i) - 'A'.ord } },
+    group: { value(n) { return this.ar.group(n).map(group => group.join('')) } },
+    
     vary: { value(n) {
       if (!this._memo_vary) this._memo_vary = {}
       if (this._memo_vary[n]) return this._memo_vary[n].clone
@@ -386,6 +393,9 @@ if (!globalThis.window) globalThis.window = globalThis
     repeat: { value(n) { return An(n).fill(Number(this)) } },
     bin: { get() { return this.toString(2) } },
     str: { get() { return String(this) } },
+    chr: { get() { return String.fromCharCode(this) } },
+    chrlower: { get() { return String.fromCharCode(this + 'a'.code) } },
+    chrupper: { get() { return String.fromCharCode(this + 'A'.code) } },
   })
 
   Object.defineProperties(Set.prototype, {
@@ -410,7 +420,7 @@ if (!globalThis.window) globalThis.window = globalThis
     keys: { get() { return K(this) } },
     values: { get() { return V(this) } },
     entries: { get() { return E(this) } },
-    key: { get() { return this.entries.map(e => e.join(':')).join(',') } },
+    okey: { get() { return this.entries.map(e => e.join(':')).join(',') } },
     
     omap: { value(f) { return U.omap(this, f) } },
     eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },

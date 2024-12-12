@@ -6,8 +6,9 @@
   "scripts": {
     "solve": "node index.js run $@",
     "new": "node index.js new",
-    "test": "node index.js test",
     "tests": "node index.js test scratch",
+    "test": "node index.js test",
+    "tes": "node index.js submit $@",
     "save": "node index.js save $@",
     "load": "node index.js load $@",
     "fetch": "node index.js fetch $@"
@@ -15,5 +16,8 @@
   "dependencies": {
     "@datastructures-js/priority-queue": "^6.3.1",
     "dotenv": "^16.4.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
