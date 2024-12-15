@@ -1,54 +1,97 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    const [W, H] = ll.n < 20 ? [11, 7] : [101, 103]
-    const Rs = ll.map(ln => {
-      let [p, v] = ln.list.map(x => x.s(2).ve)
-      return { p, v }
-    })
-    const simulate = (rs) => rs.map(r => r.p = ve((r.p.x + r.v.x + W)%W, (r.p.y + r.v.y + H)%H))
+    const DIRS = {
+      '>': ve(1, 0),
+      'v': ve(0, 1),
+      '<': ve(-1, 0),
+      '^': ve(0, -1),
+    }
+    let lls = ii.twoline
+    let dvs = lls[1].join('').ar.map(dir => DIRS[dir])
     if (1) {
-      const rs = Rs.clone
-      range(100).map(i => simulate(rs))
-      const qs = [
-        [0, 0, (W/2).floor, (H/2).floor], [(W/2).ceil, 0, W, (H/2).floor],
-        [0, (H/2).ceil, (W/2).floor, H],  [(W/2).ceil, (H/2).ceil, W, H],
-      ].map(([x1, y1, x2, y2]) => rs.f(r => r.p.x >= x1 && r.p.x < x2 && r.p.y >= y1 && r.p.y < y2).n)
-      p1(qs.product)
+      let grid = lls[0].clone.grid()
+      let bot = grid.gvof(c => c === '@')
+      dvs.map(dv => {
+        let next = bot.add(dv)
+        let move = []
+        while (grid.gget(next) === 'O') {
+          move.push(next)
+          next = next.add(dv)
+        }
+        if (grid.gget(next) !== '#') {
+          move.map(v => grid.gset(v.add(dv), 'O'))
+          grid.gset(bot.add(dv), '@')
+          grid.gset(bot, '.')
+          bot = bot.add(dv)
+        }
+      })
+      
+      let score = 0
+      grid.gfor((c, x, y) => {
+        if (c === 'O') score += 100 * y + x
+      })
+      p1(score)
     }
     if (2) {
-      const rs = Rs.clone
-      const grid = range(H).map(_=> range(W)).grid()
-      ;(() => {
-        for (let i = 0;; i++) {
-          simulate(rs)
-
-          grid.gfor((c, x, y) => grid[x][y] = ' ')
-          rs.map(r => grid[r.p.y][r.p.x] = '#')
-
-          // stop at large connected region > n/4
-          const all_explored = set()
-          for (let r = 0; r < H; r++) {
-            for (let c = 0; c < W; c++) {
-              const v = ve(c, r)
-              const char = grid.gget(v)
-              if (char !== '#' || all_explored.has(v.key)) continue
-              
-              const explored = set()
-              const frontier = [v]
-              while (frontier.length) {
-                const curr = frontier.shift()
-                if (explored.had(curr.key)) continue
-                all_explored.add(curr.key)
-                grid.gd4(curr).map(v => {
-                  if (grid.gget(v) === '#') frontier.push(v)
-                })
-                if (explored.n > rs.n / 4) return p2(i + 1)
-              }
+      let grid = lls[0].map(row => row.ar.map(c => ({
+        '#': '##',
+        '.': '..',
+        'O': '[]',
+        '@': '@.',
+      }[c])).join('')).grid()
+      let bot = grid.gvof(c => c === '@')
+      dvs.map(dv => {
+        let next = bot.add(dv)
+        if (dv.y && '[]'.includes(grid.gget(next))) {
+          let right = ve(1, 0), left = ve(-1, 0)
+          let check = [next, grid.gget(next) === '[' ? next.add(right) : next.add(left)]
+          let moves = []
+          let blocked = false
+          while (check.some(v => '[]'.includes(grid.gget(v)))) {
+            moves.push(check)
+            let forward = check.map(v => v.add(dv))
+            if (forward.some(v => grid.gget(v) === '#')) {
+              blocked = true
+              break
             }
+            let seen = set()
+            check = forward.flatMap(v => {
+              let c = grid.gget(v)
+              if (c === '[') return [v, v.add(right)]
+              if (c === ']') return [v, v.add(left)]
+              return []
+            }).filter(v => !seen.had(v.key))
+          }
+          if (!blocked) {
+            moves.reverse().map(move => move.map(v => {
+              grid.gset(v.add(dv), grid.gget(v))
+              grid.gset(v, '.')
+            }))
+            grid.gset(bot.add(dv), '@')
+            grid.gset(bot, '.')
+            bot = bot.add(dv)
+          }
+        } else {
+          let move = []
+          while ('[]'.includes(grid.gget(next))) {
+            move.push(next)
+            next = next.add(dv)
+          }
+          if (grid.gget(next) !== '#') {
+            move.reverse().map(v => grid.gset(v.add(dv), grid.gget(v)))
+            grid.gset(bot.add(dv), '@')
+            grid.gset(bot, '.')
+            bot = bot.add(dv)
           }
         }
-      })()
+      })
+      
+      let score = 0
+      grid.gfor((c, x, y) => {
+        if (c === '[') score += 100 * y + x
+      })
+      p2(score)
     }
   })
 

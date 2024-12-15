@@ -1,6 +1,7 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
+    // let lls = ii.twoline
     if (1) {
       let rs = ll.map(ln => {
 
@@ -155,6 +156,7 @@ if (!globalThis.window) globalThis.window = globalThis
     get left() { return vec.of(this.y, -this.x) }
     get clone() { return vec.of(this.x, this.y) }
     get key() { return this.x + ',' + this.y }
+    get str() { return this.key }
     get ar() { return [this.x, this.y] }
 
     static _d4 = [[1, 0], [0, 1], [-1, 0], [0, -1]]
@@ -188,7 +190,6 @@ if (!globalThis.window) globalThis.window = globalThis
     n: { get() { return this.length } },
     num: { get() { return U.n(this) } },
     numsort: { get() { return U.numsort(this.num) } },
-    clone: { get() { return U.a(this) } },
     sum: { get() { return U.sum(this) } },
     product: { get() { return U.product(this) } },
     first: { get() { return this[0] } },
@@ -200,6 +201,7 @@ if (!globalThis.window) globalThis.window = globalThis
     key: { get() { return this.join(',') } },
     str: { get() { return this.join('') } },
     set: { get() { return new Set(this) } },
+    ves: { get() { return this.map((x) => ve(typeof x === 'string' ? x.split(',').num : x)) } },
     
     i: { value(i) { return U.i(i) } },
     is: { value(i, x) { return this.i(i) === x } },
@@ -323,6 +325,7 @@ if (!globalThis.window) globalThis.window = globalThis
     ord: { get() { return this.charCodeAt(0) } },
     ordlower: { get() { return this.ord - 'a'.ord } },
     ordupper: { get() { return this.ord - 'A'.ord } },
+    ve: { get() { return ve(this.split(',').num) } },
     
     i: { value(i) { return U.i(this, i) } },
     is: { value(i, c) { return this.i(i) === c } },
@@ -396,6 +399,13 @@ if (!globalThis.window) globalThis.window = globalThis
     chr: { get() { return String.fromCharCode(this) } },
     chrlower: { get() { return String.fromCharCode(this + 'a'.code) } },
     chrupper: { get() { return String.fromCharCode(this + 'A'.code) } },
+    floor: { get() { return Math.floor(this) } },
+    ceil: { get() { return Math.ceil(this) } },
+    round: { get() { return Math.round(this) } },
+    abs: { get() { return Math.abs(this) } },
+
+    to: { value(end, step=1) { return R(this, end, step) } },
+    fixed: { value(n) { return this.toFixed(n) } },
   })
 
   Object.defineProperties(Set.prototype, {
@@ -421,6 +431,7 @@ if (!globalThis.window) globalThis.window = globalThis
     values: { get() { return V(this) } },
     entries: { get() { return E(this) } },
     okey: { get() { return this.entries.map(e => e.join(':')).join(',') } },
+    clone: { get() { return strings.json.clone(this) } },
     
     omap: { value(f) { return U.omap(this, f) } },
     eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
