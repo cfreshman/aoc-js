@@ -1,18 +1,170 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    // let lls = ii.twoline
+    let lls = ii.twoline
+    let REGS = {}
+    lls[0].map(ln => {
+      let [a, b] = ln.slice('Register '.n).split(': ')
+      REGS[a] = b.num
+    })
+    let program = lls[1][0].slice('Program: '.n)
+    let insts = program.split(',').num
     if (1) {
-      let rs = ll.map(ln => {
-
-      })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
+      let regs = REGS.clone
+      let i = 0
+      let outputs = []
+      let combo = (arg) => {
+        if (arg <= 3) return arg
+        if (arg === 4) return regs.A
+        if (arg === 5) return regs.B
+        if (arg === 6) return regs.C
+      }
+      if (insts.length < 10) {
+        while (i >= 0 && i < insts.n - 1) {
+          let op = insts[i]
+          let arg = insts[i + 1]
+          switch (op) {
+            case 0:{
+              regs.A = (regs.A / Math.pow(2, combo(arg))).floor
+            }break
+            case 1:{
+              regs.B = regs.B ^ arg
+            }break
+            case 2:{
+              regs.B = combo(arg) % 8
+            }break
+            case 3:{
+              if (regs.A !== 0) {
+                i = arg
+                continue
+              }
+            }break
+            case 4:{
+              regs.B = regs.B ^ regs.C
+            }break
+            case 5:{
+              outputs.push(combo(arg) % 8)
+            }break
+            case 6:{
+              regs.B = (regs.A / Math.pow(2, combo(arg))).floor
+            }break
+            case 7:{
+              regs.C = (regs.A / Math.pow(2, combo(arg))).floor
+            }break
+          }
+          i += 2
+        }
+      } else {
+        while (regs.A !== 0) {
+          regs.B = regs.A % 8
+          regs.B = regs.B ^ 1
+          regs.C = (regs.A / (1 << regs.B)).floor
+          regs.B = regs.B ^ 5
+          regs.B = regs.B ^ regs.C
+          regs.A = (regs.A / 8).floor
+          outputs.push(regs.B % 8)
+        }
+      }
+      p1(outputs.join(','))
     }
-    if (2) {
-
-      p2()
+    if (1) {
+      let regs = {}
+      if (insts.length < 10) {
+        let j = 0
+        let target = program.split(',').num
+        while (1) {
+          regs.A = j
+          regs.B = REGS.B
+          regs.C = REGS.C
+          let i = 0
+          let outputs = ''
+          let combo = (arg) => {
+            if (arg <= 3) return arg
+            if (arg === 4) return regs.A
+            if (arg === 5) return regs.B
+            if (arg === 6) return regs.C
+          }
+          let op, arg
+          while (i >= 0 && i < insts.n - 1) {
+            op = insts[i]
+            arg = insts[i + 1]
+            switch (op) {
+              case 0:{
+                regs.A = (regs.A / (1 << combo(arg))).floor
+              }break
+              case 1:{
+                regs.B = regs.B ^ arg
+              }break
+              case 2:{
+                regs.B = combo(arg) % 8
+              }break
+              case 3:{
+                if (regs.A !== 0) {
+                  i = arg
+                  continue
+                }
+              }break
+              case 4:{
+                regs.B = regs.B ^ regs.C
+              }break
+              case 5:{
+                let output = combo(arg) % 8
+                if (output !== target[((outputs.n + 1) / 2).floor]) {
+                  i = -1
+                  continue
+                }
+                if (outputs) outputs += ','
+                outputs += output
+              }break
+              case 6:{
+                regs.B = (regs.A / (1 << combo(arg))).floor
+              }break
+              case 7:{
+                regs.C = (regs.A / (1 << combo(arg))).floor
+              }break
+            }
+            i += 2
+          }
+          if (outputs === program) {
+            p2(j)
+            break
+          }
+          j += 1
+        }
+      } else {
+        let recurse = (i=0, avoid=set()) => {
+          let target = insts[i]
+          let A = 0, next_A = -1
+          if (i < insts.n - 1) {
+            next_A = recurse(i + 1, avoid)
+            A = next_A * 8
+          }
+          while (1) {
+            while ((A / 8).floor === next_A || next_A === -1) {
+              regs.A = BigInt(A)
+              regs.B = BigInt(REGS.B)
+              regs.C = BigInt(REGS.C)
+              
+              // hardcoded instructions from my problem input
+              regs.B = regs.A % 8n
+              regs.B = regs.B ^ 1n
+              regs.C = regs.A / (1n << regs.B)
+              regs.B = regs.B ^ 5n
+              regs.B = regs.B ^ regs.C
+              regs.A = regs.A / 8n
+  
+              let out = Number(regs.B % 8n)
+              if (out === target && !avoid.has(A)) return A
+              A += 1
+            }
+            avoid.add(next_A)
+            next_A = recurse(i + 1, avoid)
+            A = next_A * 8
+          }
+        }
+        let A = recurse()
+        p2(A)
+      }
     }
   })
 

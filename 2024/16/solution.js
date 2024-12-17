@@ -1,18 +1,64 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    // let lls = ii.twoline
+    let grid = ll.grid()
+    let s = grid.gvof(c => c === 'S')
+    let e = grid.gvof(c => c === 'E')
     if (1) {
-      let rs = ll.map(ln => {
+      let explored = set()
+      let frontier = new PQN(x => x.cost + x.h)
+      let g = (v) => v.manhat(e)
+      frontier.push({ v: s, dir: ve(1, 0), cost: 0, h: g(s) })
+      while (frontier.n) {
+        let { v, dir, cost } = frontier.pop()
+        if (explored.had([v.key, dir.key].key)) continue
+        if (v.equal(e)) {
+          p1(cost)
+          break
+        }
 
-      })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
+        ;[dir.left, dir.right].forEach(ndir => {
+          frontier.push({ v, dir: ndir, cost: cost + 1000, h: g(v) })
+        })
+        let nv = v.add(dir)
+        let c = grid.gget(nv)
+        if (c && c !== '#') {
+          frontier.push({ v: nv, dir, cost: cost + 1, h: g(nv) })
+        }
+      }
     }
     if (2) {
+      let explored = {}
+      let frontier = new PQN(x => x.cost)
+      let push = (state) => {
+        let key = [state.v.key, state.dir.key].key
+        let existing = explored[key]
+        if (existing) {
+          state.path.forEach(v => existing.path.add(v))
+        } else {
+          explored[key] = state
+          frontier.push(state)
+        }
+      }
+      push({ v: s, dir: ve(1, 0), cost: 0, path: set([s.key]) })
+      while (frontier.n) {
+        let { v, dir, cost, path } = frontier.pop()
+        if (v.equal(e)) {
+          p2(path.size + 1)
+          break
+        }
 
-      p2()
+        ;[dir.left, dir.right].forEach(ndir => {
+          push({ v, dir: ndir, cost: cost + 1000, path })
+        })
+        let nv = v.add(dir)
+        let c = grid.gget(nv)
+        if (c && c !== '#') {
+          path = path.ar.set
+          path.add(v.key)
+          push({ v: nv, dir, cost: cost + 1, path })
+        }
+      }
     }
   })
 

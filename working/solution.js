@@ -166,24 +166,20 @@ if (!globalThis.window) globalThis.window = globalThis
   }
   const ve = vec.of
 
-  if (window.require) {
-    // https://github.com/datastructures-js/priority-queue
-    const {
-      PriorityQueue: PQ,
-      MinPriorityQueue: PQN,
-      MaxPriorityQueue: PQX,
-    } = require('@datastructures-js/priority-queue')
-    ;[PQ.prototype, PQN.prototype, PQX.prototype].map(pqp => {
-      Object.defineProperties(pqp, {
-        n: { get() { return this.size() } },
-        empty: { get() { return this.isEmpty() } },
-      
-        peek: { value() { return this.front() } },
-      })
-    })
+  const {
+    PriorityQueue: PQ,
+    MinPriorityQueue: PQN,
+    MaxPriorityQueue: PQX,
+  } = require('@datastructures-js/priority-queue')
+  ;[PQ.prototype, PQN.prototype, PQX.prototype].map(pqp => {
+    Object.defineProperties(pqp, {
+      n: { get() { return this.size() } },
+      empty: { get() { return this.isEmpty() } },
     
-    window.crypto = require('crypto')
-  }
+      peek: { value() { return this.front() } },
+    })
+  })
+  const crypto = require('crypto')
   U.md5 = (str) => crypto.createHash('md5').update(str).digest('hex')
 
   Object.defineProperties(Array.prototype, {
