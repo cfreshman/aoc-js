@@ -1,19 +1,35 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
-  window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    // let lls = ii.twoline
-    if (1) {
-      let rs = ll.map(ln => {
-
-      })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
+  window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {    
+    let cos = ll.map(ln => ln.split(',').map(Number).ve)
+    let size = ll.length < 30 ? 7 : 71
+    let start = ve(0, 0), end = ve(size - 1, size - 1)
+    let run = (grid) => {
+      let explored = set()
+      let frontier = new PQN(x => x.cost + x.h)
+      let g = (v) => v.manhat(end)
+      frontier.push({ v: start, cost: 0, h: g(start) })
+      while (frontier.n) {
+        let { v, cost } = frontier.pop()
+        if (explored.had(v.key)) continue
+        if (v.equal(end)) return cost
+        grid.gd4(v).map(u => {
+          if (grid.gget(u) === '#') return
+          frontier.push({ v: u, cost: cost + 1, h: g(u) })
+        })
+      }
+      return -1
     }
-    if (2) {
-
-      p2()
+    let grid = range(size).map(r => range(size).map(c => '.')).grid()
+    let n = ll.length < 30 ? 12 : 1024
+    cos.slice(0, n).map(co => grid.gset(co, '#'))
+    p1(run(grid))
+    while (1) {
+      n++
+      grid.gset(cos[n-1], '#')
+      if (0 > run(grid)) break
     }
+    p2(ll[n-1])
   })
 
   const l = console.log, L = l

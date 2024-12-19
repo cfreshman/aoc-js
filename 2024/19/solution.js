@@ -1,18 +1,54 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    // let lls = ii.twoline
+    let lls = ii.twoline
+    let rules = lls[0][0].split(', ')
     if (1) {
-      let rs = ll.map(ln => {
-
+      let rs = lls[1].map(ln => {
+        let recurse = (i) => {
+          if (i === ln.length) return true
+          for (let rule of rules) {
+            let matches = true
+            for (let j = 0; j < rule.length; j++) {
+              if (rule[j] !== ln[i + j]) {
+                matches = false
+                break
+              }
+            }
+            if (matches && recurse(i + rule.length)) return true
+          }
+          return false
+        }
+        return recurse(0) ? 1 : 0
       })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
+      p1(rs.sum)
     }
     if (2) {
-
-      p2()
+      let rules = lls[0][0].split(', ')
+      let rs = lls[1].map(ln => {
+        let memo = {}
+        let recurse = (i) => {
+          if (i === ln.length) return 1
+          if (memo[i] !== undefined) return memo[i]
+          let count = 0
+          for (let rule of rules) {
+            let matches = true
+            for (let j = 0; j < rule.length; j++) {
+              if (rule[j] !== ln[i + j]) {
+                matches = false
+                break
+              }
+            }
+            if (matches) {
+              count += recurse(i + rule.length)
+            }
+          }
+          memo[i] = count
+          return count
+        }
+        return recurse(0)
+      })
+      p2(rs.sum)
     }
   })
 

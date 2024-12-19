@@ -197,6 +197,7 @@ if (!globalThis.window) globalThis.window = globalThis
     key: { get() { return this.join(',') } },
     str: { get() { return this.join('') } },
     set: { get() { return new Set(this) } },
+    ve: { get() { return ve(this) } },
     ves: { get() { return this.map((x) => ve(typeof x === 'string' ? x.split(',').num : x)) } },
     
     i: { value(i) { return U.i(i) } },
