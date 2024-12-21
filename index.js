@@ -4,7 +4,7 @@ const fs = require('fs')
 const child_process = require('child_process')
 const pkg = require('./package.json')
 
-let year = 2024, day = 19
+let year = 2024, day = 21
 const main = async () => {
   const [command, ...args] = process.argv.slice(2)
   if (command === 'test') {
