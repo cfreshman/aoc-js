@@ -2,18 +2,72 @@ if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     // let lls = ii.twoline
+    let G = {}, Ge = set()
+    ll.map(ln => {
+      let [a, b] = ln.split('-')
+      if (!G[a]) G[a] = []
+      if (!G[b]) G[b] = []
+      G[a].push(b)
+      G[b].push(a)
+      Ge.add(a + '-' + b)
+      Ge.add(b + '-' + a)
+    })
+    let has_edge = (a, b) => Ge.has(a + '-' + b)
     if (1) {
-      // let grid = ll.grid()
-      let rs = ll.map(ln => {
-
-      })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
+      let t_threes = set()
+      for (let a of keys(G)) {
+        G[a].permute(2).map(([b, c]) => {
+          if (has_edge(b, c) && [a, b, c].some(x => x.startsWith('t'))) {
+            t_threes.add([a, b, c].sort().join('-'))
+          }
+        })
+      }
+      p1(t_threes.n)
     }
     if (2) {
-
-      p2()
+      let max_complete = []
+      for (let a of keys(G)) {
+        let threes = G[a].permute(2).filter(([b, c]) => has_edge(b, c))
+        let edges = set()
+        let nodes_set = set()
+        for (let [b, c] of threes) {
+          edges.add(b + '-' + c)
+          edges.add(c + '-' + b)
+          nodes_set.add(b)
+          nodes_set.add(c)
+        }
+        let nodes = nodes_set.ar
+        // try different combinations of threes to find max complete subgraph
+        // check in decreasing order of number of nodes
+        // only check if size >= max_complete size
+        let n_combos = Math.pow(2, nodes.n)
+        let ons_list = range(1, n_combos).map(i => {
+          let ons = i.toString(2).padStart(nodes.n, '0').split('').map(Number)
+          return {
+            size: ons.sum,
+            ons,
+          }
+        }).filter(x => x.size >= max_complete.n).sort((a, b) => b.size - a.size).map(x => x.ons)
+        for (let ons of ons_list) {
+          let ins = nodes.filter((x, i) => ons[i])
+          let connected = true
+          for (let ib = 0; ib < ins.n - 1; ib++) {
+            for (let ic = ib + 1; ic < ins.n; ic++) {
+              if (!edges.has(ins[ib] + '-' + ins[ic])) {
+                connected = false
+                break
+              }
+            }
+            if (!connected) break
+          }
+          if (connected) {
+            ins.push(a)
+            max_complete = ins
+            break
+          }
+        }
+      }
+      p2(max_complete.sort().join(','))
     }
   })
 
@@ -432,7 +486,7 @@ if (!globalThis.window) globalThis.window = globalThis
     clone: { get() { return strings.json.clone(this) } },
     
     // omap: { value(f) { return U.omap(this, f) } },
-    // eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
+    // // eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
     // concat: { value(ob) { return { ...this, ...ob } } },
   })
 

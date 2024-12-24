@@ -3,6 +3,7 @@ if (!globalThis.window) globalThis.window = globalThis
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
     // let lls = ii.twoline
     if (1) {
+      // let grid = ll.grid()
       let rs = ll.map(ln => {
 
       })
@@ -424,15 +425,15 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Object.prototype, {
-    keys: { get() { return K(this) } },
-    values: { get() { return V(this) } },
-    entries: { get() { return E(this) } },
-    okey: { get() { return this.entries.map(e => e.join(':')).join(',') } },
+    // keys: { get() { return K(this) } },
+    // values: { get() { return V(this) } },
+    // entries: { get() { return E(this) } },
+    // okey: { get() { return this.entries.map(e => e.join(':')).join(',') } },
     clone: { get() { return strings.json.clone(this) } },
     
-    omap: { value(f) { return U.omap(this, f) } },
-    eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
-    concat: { value(ob) { return { ...this, ...ob } } },
+    // omap: { value(f) { return U.omap(this, f) } },
+    // eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
+    // concat: { value(ob) { return { ...this, ...ob } } },
   })
 
   

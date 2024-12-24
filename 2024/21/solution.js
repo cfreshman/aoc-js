@@ -1,20 +1,125 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    // let lls = ii.twoline
-    if (1) {
-      // let grid = ll.grid()
-      let rs = ll.map(ln => {
+    
+    let numpad = '789,456,123, 0A'.split(',').grid()
+    let num2pos = {}
+    numpad.gvfor((c, v) => num2pos[c] = v)
+    let dirpad = ' ^A,<v>'.split(',').grid()
+    let dir2pos = {}
+    dirpad.gvfor((c, v) => dir2pos[c] = v)
 
+    let DIRS = 'v^<>'.split('')
+    let DIR_2_OFF = {
+      '^': ve(0, -1),
+      'v': ve(0, 1),
+      '<': ve(-1, 0),
+      '>': ve(1, 0),
+    }
+
+    let costs = {}
+    let vary = 'A^v<>'.vary(2).map(x => x.ar)
+    range(26).map(i => {
+      let level = i
+      vary.map(([a, b]) => {
+        let key = [level, a, b].key
+        if (!level) {
+          costs[key] = 1
+          return
+        }
+        let pos_start = dir2pos[a], pos_end = dir2pos[b]
+        let frontier = [{ pos: pos_start, cost: 0, dir: 'A' }]
+        let explored = set()
+        while (frontier.n) {
+          let { pos, cost, dir:last_dir } = frontier.shift()
+          if (pos.equal(pos_end)) {
+            // add A to submit
+            cost += costs[[level - 1, last_dir, 'A'].key]
+            if (cost < (costs[key] ?? Infinity)) {
+              costs[key] = cost
+            }
+            continue
+          }
+          if (explored.had(pos.key)) continue
+          DIRS.map(dir => {
+            let next = pos.add(DIR_2_OFF[dir])
+            let next_char = dirpad.gget(next)
+            if (!next_char || next_char === ' ') return
+            let next_cost = costs[[level - 1, last_dir, dir].key]
+            frontier.push({ pos: next, cost: cost + next_cost, dir })
+          })
+        }
       })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
-    }
-    if (2) {
+    })
 
-      p2()
+    let path_lists = ll.map(ln => {
+      let targets = ln.split('')
+      let last = ve(2, 3), path_nums = []
+      for (let i = 0; i < targets.length; i++) {
+        let target = targets[i]
+        let target_num = num2pos[target]
+        let frontier = [{ pos: last, dir: null, from: null, cost: 0 }]
+        let ends = [], min_cost = Infinity
+        while (frontier.n) {
+          let curr = frontier.shift()
+          let { pos, cost } = curr
+          if (pos.equal(target_num)) {
+            ends.push(curr)
+            min_cost = Math.min(min_cost, cost)
+          }
+          if (cost > min_cost) break
+          DIRS.forEach(dir => {
+            let next = pos.add(DIR_2_OFF[dir])
+            if (numpad.ginside(next) && numpad.gget(next) !== ' ') {
+              frontier.push({ pos: next, dir, from: curr, cost: cost + 1 })
+            }
+          })
+        }
+        let path_parts = []
+        for (let ended of ends) {
+          let path = []
+          let curr = ended
+          while (curr.from) {
+            path.push(curr.dir)
+            curr = curr.from
+          }
+          path.reverse()
+          path_parts.push(path.join('') + 'A')
+        }
+        path_nums.push(path_parts)
+        last = target_num
+      }
+      let paths = path_nums[0]
+      path_nums.slice(1).forEach(path_parts => {
+        paths = paths.flatMap(path => path_parts.map(part => path + part))
+      })
+      {
+        let min_length = paths.map(path => path.n).min
+        paths = paths.filter(path => path.n === min_length)
+      }
+      return paths
+    })
+    let run = (level) => {
+      let rs = path_lists.map((paths, i) => {
+        let ln = ll[i]
+        let min = Infinity
+        for (let path of paths) {
+          let cost = 0
+          let last = 'A'
+          for (let i = 0; i < path.n; i++) {
+            let path_i_cost = costs[[level, last, path[i]].key]
+            cost += path_i_cost
+            last = path[i]
+          }
+          min = Math.min(min, cost)
+        }
+        let numeric = Number(ln.slice(0, -1))
+        return min * numeric
+      })
+      return rs.sum
     }
+    p1(run(2))
+    p1(run(25))
   })
 
   const l = console.log, L = l
@@ -425,15 +530,15 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Object.prototype, {
-    // keys: { get() { return K(this) } },
-    // values: { get() { return V(this) } },
-    // entries: { get() { return E(this) } },
-    // okey: { get() { return this.entries.map(e => e.join(':')).join(',') } },
+    keys: { get() { return K(this) } },
+    values: { get() { return V(this) } },
+    entries: { get() { return E(this) } },
+    okey: { get() { return this.entries.map(e => e.join(':')).join(',') } },
     clone: { get() { return strings.json.clone(this) } },
     
-    // omap: { value(f) { return U.omap(this, f) } },
-    // eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
-    // concat: { value(ob) { return { ...this, ...ob } } },
+    omap: { value(f) { return U.omap(this, f) } },
+    eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
+    concat: { value(ob) { return { ...this, ...ob } } },
   })
 
   

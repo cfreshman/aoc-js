@@ -1,19 +1,51 @@
 if (!globalThis.window) globalThis.window = globalThis
 ;(() => {
   window.solution = (ii) => U.answer(ii, (ll, p1, p2) => {
-    // let lls = ii.twoline
+    let mod = (x) => (x % 16777216 + 16777216) % 16777216
     if (1) {
-      // let grid = ll.grid()
       let rs = ll.map(ln => {
-
+        let secret = ln.num
+        range(2000).map(i => {
+          let next = secret
+          next = mod((next * 64) ^ next)
+          next = mod(Math.floor(next / 32) ^ next)
+          next = mod((next * 2048) ^ next)
+          secret = next
+        })
+        return secret
       })
-      p1()
-      // p1(rs.sum)
-      // p1(rs.product)
+      p1(rs.sum)
     }
     if (2) {
-
-      p2()
+      let outer = {}
+      let one = (x) => String(x).at(-1)
+      ll.map(ln => {
+        let secret = ln.num
+        let one_last = one(secret).num
+        let four = []
+        let inner = {}
+        range(2000).map(i => {
+          let next = secret
+          next = mod((next * 64) ^ next)
+          next = mod(Math.floor(next / 32) ^ next)
+          next = mod((next * 2048) ^ next)
+          secret = next
+          let one_num = one(secret).num
+          four.push(one_num - one_last)
+          if (four.length > 4) four.shift()
+          if (four.length === 4) {
+            let key = four.key
+            if (undefined === inner[key]) inner[key] = one_num
+          }
+          one_last = one_num
+        })
+        keys(inner).map(k => {
+          if (!outer[k]) outer[k] = []
+          outer[k].push(inner[k])
+        })
+      })
+      let max = U.maxxing(keys(outer), k => sum(outer[k]))
+      p2(sum(outer[max]))
     }
   })
 
@@ -425,15 +457,15 @@ if (!globalThis.window) globalThis.window = globalThis
   })
 
   Object.defineProperties(Object.prototype, {
-    // keys: { get() { return K(this) } },
-    // values: { get() { return V(this) } },
-    // entries: { get() { return E(this) } },
-    // okey: { get() { return this.entries.map(e => e.join(':')).join(',') } },
+    keys: { get() { return K(this) } },
+    values: { get() { return V(this) } },
+    entries: { get() { return E(this) } },
+    okey: { get() { return this.entries.map(e => e.join(':')).join(',') } },
     clone: { get() { return strings.json.clone(this) } },
     
-    // omap: { value(f) { return U.omap(this, f) } },
-    // eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
-    // concat: { value(ob) { return { ...this, ...ob } } },
+    omap: { value(f) { return U.omap(this, f) } },
+    eq: { value(ob) { return this.keys.length === ob.keys.length && this.keys.every(k => this[k] === ob[k]) } },
+    concat: { value(ob) { return { ...this, ...ob } } },
   })
 
   
